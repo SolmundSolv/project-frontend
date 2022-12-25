@@ -1,38 +1,24 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-  // Further reading:
-  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
   url      = env("DATABASE_URL")
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// Necessary for Next auth
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? // @db.Text
-  access_token      String? // @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? // @db.Text
+  id_token          String?
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -52,6 +38,7 @@ model User {
   name          String?
   email         String?   @unique
   emailVerified DateTime?
+  password      String
   image         String?
   accounts      Account[]
   sessions      Session[]
@@ -71,10 +58,10 @@ model Product {
   price       Decimal   @default(0)
   img         String    @default("")
   description String    @default("Descripton")
-  category    Category? @relation(fields: [categoryId], references: [id])
   categoryId  String?
-  orders      Order[]
   isActive    Boolean   @default(true)
+  category    Category? @relation(fields: [categoryId], references: [id])
+  orders      Order[]
 }
 
 model Category {
@@ -87,20 +74,20 @@ model Category {
 model Order {
   id           String      @id @default(cuid())
   number       Int         @unique
-  contractor   Contractor  @relation(fields: [contractorId], references: [id])
   contractorId String
-  status       OrderStatus @relation(fields: [statusId], references: [id])
   statusId     String
   price        Decimal
   createdAt    DateTime    @default(now())
+  status       OrderStatus @relation(fields: [statusId], references: [id])
+  contractor   Contractor  @relation(fields: [contractorId], references: [id])
   products     Product[]
 }
 
 model OrderStatus {
   id        String   @id @default(cuid())
   name      String
-  orders    Order[]
   createdAt DateTime @default(now())
+  orders    Order[]
 }
 
 model Contractor {
@@ -109,8 +96,8 @@ model Contractor {
   phone     String?
   lastOrder DateTime?
   createdAt DateTime  @default(now())
-  adress    Adress    @relation(fields: [adressId], references: [id])
   adressId  String
+  adress    Adress    @relation(fields: [adressId], references: [id])
   Orders    Order[]
 }
 
@@ -129,9 +116,9 @@ model Employee {
   id         String   @id @default(cuid())
   firstName  String
   lastName   String
-  position   Position @relation(fields: [positionId], references: [id])
   positionId String
   hiredAt    DateTime
+  position   Position @relation(fields: [positionId], references: [id])
 }
 
 model Position {
@@ -145,12 +132,3 @@ model Raports {
   id        String   @id @default(cuid())
   createdAt DateTime
 }
-
-// model ProductsOnOrders {
-//     product   Product? @relation(fields: [productId], references: [id])
-//     productId String
-//     Order     Order?   @relation(fields: [orderId], references: [id])
-//     orderId   String
-
-//     @@unique([productId, orderId])
-// }

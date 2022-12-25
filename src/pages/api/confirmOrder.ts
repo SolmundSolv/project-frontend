@@ -31,7 +31,6 @@ const confirmOrder = async (req: NextApiRequest, res: NextApiResponse) => {
       res.send("success");
     }
   });
-  //TODO: add record to db
 };
 
 export default confirmOrder;

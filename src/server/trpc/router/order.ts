@@ -30,4 +30,7 @@ export const orderRouter = router({
         },
       });
     }),
+  all: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.order.findMany();
+  }),
 });

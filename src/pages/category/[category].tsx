@@ -14,7 +14,6 @@ const Category: NextPageWithLayout = () => {
     var { data: products, isLoading } = trpc.product.byCategory.useQuery({
       category: category?.toString(),
     });
-  console.log(products);
   if (isLoading || !products)
     return (
       <div className="min-h-screen bg-white dark:bg-gray-600">
