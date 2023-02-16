@@ -1,59 +1,83 @@
 import AdminLayout from "../../../../components/Admin/AdminLayout";
 import type { NextPageWithLayout } from "../../_app";
 
-import React from "react";
+import React, { useState } from "react";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { Kanban } from "../../../types/responses";
+import AddForm from "./AddForm";
+import Link from "next/link";
+import withAuth from "../WithAuth";
 
 type Task = {
   id: string;
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
-  comments: number;
-  workers: number;
+  name: string;
+  createdAt: string;
+  KanbanTaskLabel: { name: string }[];
+  KanbanTaskAttachment: { name: string }[];
 };
 
-function KanbanBoard({ title, tasks }: { title: string; tasks: Task[] }) {
+function KanbanBoard({
+  title,
+  tasks,
+  id,
+}: {
+  title: string;
+  tasks: Task[];
+  id: string;
+}) {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="mb-4 rounded-lg bg-gray-200 p-6 shadow-lg">
       <div className="flex h-fit gap-2">
         <h2 className="mb-4 text-lg font-bold">{title}</h2>
         <small className="h-fit rounded-lg bg-blue-600 from-black px-2 align-middle font-bold text-white">
-          {tasks.length}
+          {tasks?.length}
         </small>
       </div>
-      <div className="mb-4 max-h-[560px] overflow-hidden hover:overflow-scroll">
-        {tasks.map((task) => (
-          <Task key={task.id} {...task} />
+      <div className="mb-4 max-h-[560px] overflow-hidden hover:overflow-auto">
+        {tasks?.map((task) => (
+          <Task comments={0} workers={0} key={task.id} {...task} />
         ))}
       </div>
-      <button className="w-full rounded-lg bg-blue-200 py-2 px-4 font-bold text-blue-600 hover:bg-blue-700 hover:text-white">
+      <button
+        className="w-full rounded-lg bg-blue-200 py-2 px-4 font-bold text-blue-600 hover:bg-blue-700 hover:text-white"
+        onClick={() => setOpen(true)}
+      >
         Add Task
       </button>
+      <AddForm open={open} setOpen={setOpen} id={id} />
     </div>
   );
 }
 
 function Task({
-  title,
-  description,
-  date,
-  tags,
-  comments,
-  workers,
+  id,
+  createdAt,
+  KanbanTaskLabel,
+  KanbanTaskAttachment,
+  comments = 0,
+  workers = 0,
+  tags = [],
 }: {
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
+  id: string;
+  createdAt: string;
+  KanbanTaskLabel: { name: string }[];
+  KanbanTaskAttachment: { name: string }[];
   comments: number;
   workers: number;
+  tags?: string[];
 }) {
   return (
     <div className="mb-4 rounded-lg bg-white p-6 shadow-lg">
-      <h3 className="mb-2 text-lg font-bold">{title}</h3>
+      <Link
+        href={`tasks/${id}`}
+        className="mb-2 text-lg font-bold hover:text-blue-500 hover:underline"
+      >
+        {KanbanTaskLabel[0]?.name}
+      </Link>
       <p className="mb-4 max-h-24 overflow-clip font-sans text-gray-700">
-        {description}
+        {KanbanTaskAttachment[0]?.name}
       </p>
       <div className="mb-4 flex flex-wrap">
         {tags.map((tag) => (
@@ -74,7 +98,7 @@ function Task({
           >
             <path d="M10 20a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm7.75-8a8.01 8.01 0 0 0 0-4h-3.82a28.81 28.81 0 0 1 0 4h3.82zm-.82 2h-3.22a14.44 14.44 0 0 1-.95 3.51A8.03 8.03 0 0 0 16.93 14zm-8.85-2h3.84a24.61 24.61 0 0 0 0-4H8.08a24.61 24.61 0 0 0 0 4zm.25 2c.41 2.4 1.13 4 1.67 4s1.26-1.6 1.67-4H8.33zm-6.08-2h3.82a28.81 28.81 0 0 1 0-4H2.25a8.01 8.01 0 0 0 0 4zm.82 2a8.03 8.03 0 0 0 4.17 3.51c-.42-.96-.74-2.16-.95-3.51H3.07zm13.86-8a8.03 8.03 0 0 0-4.17-3.51c.42.96.74 2.16.95 3.51h3.22zm-8.6 0h3.34c-.41-2.4-1.13-4-1.67-4S8.74 3.6 8.33 6zM3.07 6h3.22c.2-1.35.53-2.55.95-3.51A8.03 8.03 0 0 0 3.07 6z" />
           </svg>
-          {date}
+          {createdAt.split("T")[0]}
         </div>
         <div className="flex gap-2">
           <div className="ml-4 flex">
@@ -117,243 +141,46 @@ function Task({
   );
 }
 
-const Tasks: NextPageWithLayout = (): JSX.Element => {
+const Tasks = ({
+  kanban,
+}: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element => {
+  if (!kanban) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="h-full bg-slate-100 p-6 font-mono">
       <div className="h-full rounded-lg border border-gray-200 bg-white p-6 shadow-lg">
         <h1 className="text-2xl font-semibold">Tasks</h1>
         <div className="flex max-w-[100vw-200px] overflow-x-scroll">
-          <div className="min-w-[20vw] p-4">
-            {KanbanBoard({
-              title: "To Do",
-              tasks: [
-                {
-                  id: "1",
-                  title: "Task 1",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 10,
-                  workers: 5,
-                },
-                {
-                  id: "2",
-                  title: "Task 2",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 33,
-                  workers: 15,
-                },
-                {
-                  id: "3",
-                  title: "Task 3",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 50,
-                  workers: 51,
-                },
-              ],
-            })}
-          </div>
-          <div className="min-w-[20vw] p-4">
-            {KanbanBoard({
-              title: "To Do",
-              tasks: [
-                {
-                  id: "1",
-                  title: "Task 1",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 10,
-                  workers: 5,
-                },
-                {
-                  id: "2",
-                  title: "Task 2",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 33,
-                  workers: 15,
-                },
-                {
-                  id: "3",
-                  title: "Task 3",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 50,
-                  workers: 51,
-                },
-              ],
-            })}
-          </div>
-          <div className="min-w-[20vw] p-4">
-            {KanbanBoard({
-              title: "To Do",
-              tasks: [
-                {
-                  id: "1",
-                  title: "Task 1",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 10,
-                  workers: 5,
-                },
-                {
-                  id: "2",
-                  title: "Task 2",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 33,
-                  workers: 15,
-                },
-                {
-                  id: "3",
-                  title: "Task 3",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 50,
-                  workers: 51,
-                },
-              ],
-            })}
-          </div>
-          <div className="min-w-[20vw] p-4">
-            {KanbanBoard({
-              title: "To Do",
-              tasks: [
-                {
-                  id: "1",
-                  title: "Task 1",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 10,
-                  workers: 5,
-                },
-                {
-                  id: "2",
-                  title: "Task 2",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 33,
-                  workers: 15,
-                },
-                {
-                  id: "3",
-                  title: "Task 3",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 50,
-                  workers: 51,
-                },
-              ],
-            })}
-          </div>
-          <div className="min-w-[20vw] p-4">
-            {KanbanBoard({
-              title: "In Progress",
-              tasks: [
-                {
-                  id: "1",
-                  title: "Task 4",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 33,
-                  workers: 15,
-                },
-                {
-                  id: "2",
-                  title: "Task 5",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 50,
-                  workers: 51,
-                },
-              ],
-            })}
-          </div>
-          <div className="min-w-[20vw] p-4">
-            {KanbanBoard({
-              title: "Done",
-              tasks: [
-                {
-                  id: "1",
-                  title: "Task 6",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 33,
-                  workers: 15,
-                },
-                {
-                  id: "2",
-                  title: "Task 7",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 50,
-                  workers: 51,
-                },
-                {
-                  id: "3",
-                  title: "Task 8",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 33,
-                  workers: 15,
-                },
-                {
-                  id: "4",
-                  title: "Task 9",
-                  description:
-                    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quisquam, similique?",
-                  date: "2021-01-01",
-                  tags: ["tag1", "tag2", "tag3"],
-                  comments: 50,
-                  workers: 51,
-                },
-              ],
-            })}
-          </div>
+          {kanban.map((item) => (
+            <div className="min-w-[20vw] max-w-[30vw] p-4" key={item.id}>
+              <KanbanBoard title={item.name} tasks={item.tasks} id={item.id} />
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 };
+
+const TaskAuth = withAuth(Tasks);
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-Tasks.getLayout = (page) => {
+TaskAuth.getLayout = (page) => {
   return <AdminLayout>{page}</AdminLayout>;
 };
 
-export default Tasks;
+export const getServerSideProps: GetServerSideProps<{
+  kanban: Kanban[];
+}> = async (context) => {
+  const res = await fetch(
+    "http://localhost:3001/kanban/clc3f137b0000tk6wv3ytwdlo"
+  );
+  const kanban = await res.json();
+  return {
+    props: {
+      kanban,
+    },
+  };
+};
+export default TaskAuth;

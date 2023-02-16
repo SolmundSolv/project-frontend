@@ -84,8 +84,8 @@ export default function Layout({ children, session }: any) {
           </nav>
         </header>
         <main>{children}</main>
-        <Footer />
       </div>
+      <Footer />
     </StateContext>
   );
 }

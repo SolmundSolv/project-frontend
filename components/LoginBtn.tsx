@@ -5,14 +5,29 @@ import Link from "next/link";
 export default function LoginBtn() {
   const { data: session } = useSession();
   const ctx = useStateContext();
-  if (ctx?.user?.user) {
+  function isLogin() {
+    if (!ctx?.user?.user) {
+      return false;
+    }
+    return true;
+  }
+  if (isLogin()) {
     return (
       <>
-        <p className="text-sm font-medium">{ctx.user.user.name ?? ""}</p> <br />
+        <a
+          className="text-sm font-medium"
+          href={`/account/${localStorage.getItem("token")}`}
+        >
+          {ctx?.user?.user.name ?? ""}
+        </a>{" "}
+        <br />
         <button
           className="text-sm font-medium"
           type="submit"
-          onClick={() => localStorage.removeItem("token")}
+          onClick={() => {
+            localStorage.removeItem("token");
+            window.location.reload();
+          }}
         >
           Sign out
         </button>

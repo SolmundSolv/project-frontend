@@ -7,20 +7,23 @@ import type {
 import type { ReactElement } from "react";
 import React from "react";
 import Item from "../../components/Store/Item";
+import ItemList from "../../components/Store/ItemList";
 import Layout from "../../components/Store/Layout";
-import type { Product } from "@prisma/client";
+import type { Product } from "../../src/types/responses";
 
 const Search = ({
   products,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter();
+  const { value } = router.query;
   return (
     <div className="min-h-screen bg-white dark:bg-gray-600">
       <div className="mx-auto max-w-2xl py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h2 className="sr-only">Products</h2>
-        <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {products?.map((res) => (
-            <Item item={res} key={res.id} />
-          ))}
+        <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+          Search for: {value}
+        </h2>
+        <div className="mt-4 flex gap-6">
+          <ItemList items={products} />
         </div>
       </div>
     </div>

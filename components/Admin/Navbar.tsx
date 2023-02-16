@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import LoginBtn from "./LoginBtn";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -34,9 +35,9 @@ function Navbar() {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M19 9l-7 7-7-7"
                 ></path>
               </svg>
@@ -56,12 +57,7 @@ function Navbar() {
                   >
                     Change password
                   </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
-                  >
-                    Sign out
-                  </a>
+                  <LoginBtn />
                 </div>
               </div>
             )}

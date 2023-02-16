@@ -1,13 +1,11 @@
-import type { SortingState, Table } from "@tanstack/react-table";
+import type { SortingState } from "@tanstack/react-table";
 import {
-  createColumnHelper,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import Link from "next/link";
 import React from "react";
 
 type Order = {
@@ -22,7 +20,7 @@ function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-const Table = (props: { tableData: any[]; columns: any[] }) => {
+const EmployeeTable = (props: { tableData: any[]; columns: any[] }) => {
   const { tableData, columns } = props;
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [data, setData] = React.useState(() => [...tableData]);
@@ -34,7 +32,6 @@ const Table = (props: { tableData: any[]; columns: any[] }) => {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    
   });
 
   return (
@@ -140,4 +137,4 @@ const Table = (props: { tableData: any[]; columns: any[] }) => {
   );
 };
 
-export default Table;
+export default EmployeeTable;

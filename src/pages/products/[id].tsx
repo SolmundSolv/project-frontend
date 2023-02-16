@@ -1,19 +1,15 @@
 import type { ReactElement } from "react";
-import { trpc } from "../../utils/trpc";
-import { useRouter } from "next/router";
 import { useStateContext } from "../../../context/StateContext";
 import Layout from "../../../components/Store/Layout";
-import type { NextPageWithLayout } from "../_app";
 import Image from "next/image";
-import { Product } from "../../types/responses";
+import type { Product } from "../../types/responses";
 import type {
   GetServerSideProps,
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
 } from "next/types";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
-const Product: NextPageWithLayout = ({
+import Link from "next/link";
+const ProductPage = ({
   product,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const ctx = useStateContext();
@@ -21,141 +17,72 @@ const Product: NextPageWithLayout = ({
     return <div>Product not found</div>;
   }
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-600">
-      <div className="pt-6">
-        <nav aria-label="Breadcrumb">
-          {/* <ol role="list" className="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                        {product?.map((breadcrumb) => (
-                            <li key={breadcrumb.id}>
-                                <div className="flex items-center">
-                                    <a href="#" className="mr-2 text-sm font-medium text-gray-900 dark:text-white">
-                                        {breadcrumb.name}
-                                    </a>
-                                    <svg width={16} height={20} viewBox="0 0 16 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="h-5 w-4 text-gray-300">
-                                        <path d="M5.697 4.34L8.98 16.532h1.327L7.025 4.341H5.697z" />
-                                    </svg>
-                                </div>
-                            </li>
-                        ))}
-                        <li className="text-sm">
-                            <a href={product.href} aria-current="page" className="font-medium text-gray-500 hover:text-gray-600 dark:text-gray-200">
-                                {product.name}
-                            </a>
-                        </li>
-                    </ol> */}
-        </nav>
-        {/* Image gallery */}
-        <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8">
-          <div className="aspect-w-3 aspect-h-4 hidden overflow-hidden rounded-lg lg:block">
-            <Image
-              src={`/img/${product.img}`}
-              alt={product?.img}
-              width={500}
-              height={500}
-              className="h-full w-full object-cover object-center"
-            />
-          </div>
-          <div className="hidden lg:grid lg:grid-cols-1 lg:gap-y-8">
-            <div className="aspect-w-3 aspect-h-2 overflow-hidden rounded-lg">
-              <Image
-                src={`/img/${product.img}`}
-                alt={product?.img}
-                width={500}
-                height={500}
-                className="h-full w-full object-cover object-center"
-              />
-            </div>
-            <div className="aspect-w-3 aspect-h-2 overflow-hidden rounded-lg">
-              <Image
-                src={`/img/${product.img}`}
-                alt={product?.img}
-                width={500}
-                height={500}
-                className="h-full w-full object-cover object-center"
-              />
-            </div>
-          </div>
-          <div className="aspect-w-4 aspect-h-5 sm:overflow-hidden sm:rounded-lg lg:aspect-w-3 lg:aspect-h-4">
-            <Image
-              src={`/img/${product.img}`}
-              alt={product?.img}
-              width={500}
-              height={500}
-              className="h-full w-full object-cover object-center"
-            />
-          </div>
+    <div className="grid min-h-screen gap-4 bg-slate-50 p-6 dark:bg-gray-600 lg:grid-cols-2">
+      <div>
+        <Image
+          src={`/img/${product.img}`}
+          alt={product?.img}
+          width={800}
+          height={800}
+          className="mx-auto w-full rounded-lg object-cover object-center shadow-md"
+        />
+      </div>
+      <div className="h-fit rounded-md bg-white p-6 shadow-md dark:bg-gray-500">
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900 underline underline-offset-8 dark:text-white sm:text-3xl">
+          {product?.name}
+        </h1>
+        <div className="mt-4">
+          <span className="inline-flex text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-200">
+            {product?.price}$ per day
+          </span>
         </div>
-
-        {/* Product info */}
-        <div className="mx-auto max-w-2xl px-4 pt-10 pb-16 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pt-16 lg:pb-24">
-          <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
-              {product?.name}
-            </h1>
-          </div>
-
-          {/* Options */}
-          <div className="mt-4 lg:row-span-3 lg:mt-0">
-            <h2 className="sr-only">Product information</h2>
-            <p className="text-3xl tracking-tight text-gray-900 dark:text-white">
-              $ {product?.price.toString()}
-            </p>
-            <div className="mt-8 flex flex-grow gap-6">
-              <button
-                className="flex-grow rounded-xl border-2 border-yellow-400 bg-white px-8 py-2 font-bold text-yellow-400"
-                onClick={() => ctx?.onAdd(product)}
-              >
-                Add to cart
-              </button>
-              <button className="flex-grow rounded-xl border-2  border-yellow-400 bg-yellow-400 px-8 py-2 font-bold text-white">
-                Buy now
-              </button>
+        <div className="mt-4">
+          <span className="inline-flex font-semibold tracking-wide text-gray-900 dark:text-white">
+            {product?.description}
+          </span>
+        </div>
+        <div className="mt-8 flex flex-grow flex-col gap-6">
+          <button
+            className="flex-grow rounded-xl border-2 border-yellow-400 bg-white px-8 py-2 font-bold text-yellow-400"
+            onClick={() => ctx?.onAdd(product)}
+          >
+            Add to cart
+          </button>
+          <Link
+            href="/cart"
+            className="flex-grow rounded-xl border-2  border-yellow-400 bg-yellow-400 px-8 py-2 text-center font-bold text-white"
+            onClick={() => ctx?.onAdd(product)}
+          >
+            Order now
+          </Link>
+        </div>
+        <div className="mt-4">
+          <span className="inline-flex font-semibold tracking-wide text-gray-500 dark:text-white">
+            Available quantity: {product?.availableQuantity}
+          </span>
+        </div>
+        <div className="mt-4">
+          <span className="inline-flex text-lg font-semibold tracking-wide text-gray-500 dark:text-white">
+            Details:
+          </span>
+          {product?.ModelDetails?.map((option) => (
+            <div
+              key={option.id}
+              className="flex w-full flex-row items-center justify-between rounded-md border-b border-gray-500 p-2 dark:border-gray-200"
+            >
+              <span className="font-bold dark:text-white">{option.name}</span>
+              <span className="dark:text-white">{option.value}</span>
             </div>
-          </div>
-
-          {/* Description and details */}
-          <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pt-6 lg:pb-16 lg:pr-8">
-            <div>
-              <h3 className="sr-only">Description</h3>
-
-              <div className="space-y-6">
-                <p className="text-base text-gray-900 dark:text-white">
-                  {product?.description}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-10">
-              <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                Highlights
-              </h3>
-
-              <div className="mt-4">
-                <ul role="list" className="list-disc space-y-2 pl-4 text-sm">
-                  LIST
-                </ul>
-              </div>
-            </div>
-
-            <div className="mt-10">
-              <h2 className="text-sm font-medium text-gray-900 dark:text-white">
-                Details
-              </h2>
-
-              <div className="mt-4 space-y-6">
-                <p className="text-sm text-gray-600">DETAILS</p>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>
   );
 };
-Product.getLayout = function getLayout(page: ReactElement) {
+ProductPage.getLayout = (page: ReactElement) => {
   return <Layout>{page}</Layout>;
 };
-export default Product;
+export default ProductPage;
 
 export const getServerSideProps: GetServerSideProps<{
   product: Product;

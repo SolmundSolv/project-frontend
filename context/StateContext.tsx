@@ -1,19 +1,32 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import type { Product } from "../src/types/responses";
+import type { CartItem, Product } from "../src/types/responses";
 type User = {
   user: {
     id: string;
     name: string;
     email: string;
     role: { name: string };
+    phone: string;
+    adress: {
+      street: string;
+      city: string;
+      zip: string;
+      country: string;
+      building: string;
+    };
   };
 };
 
 interface AppContextProps {
   cartItems: Product[];
   totalPrice: number;
+  days: number;
   onAdd: (item: Product) => void;
   onRemove: (item: Product) => void;
+  incrementDays: () => void;
+  decrementDays: () => void;
+  setDays: (days: number) => void;
+  isLogin: () => boolean;
   user: User | null;
 }
 const Context = createContext<AppContextProps | null>(null);
@@ -24,6 +37,40 @@ const StateContext = ({ children }: any) => {
   const [cartItems, setCartItems] = useState(cart);
   const [totalPrice, setTotalPrice] = useState(0);
   const [user, setUser] = useState<User | null>(null);
+  const [days, setDays] = useState(1);
+
+  React.useEffect(() => {
+    if (localStorage.getItem("cartId") !== null) {
+      fetch(
+        `http://localhost:3001/cart/${localStorage.getItem("cartId")}`
+      ).then((res) => {
+        res.json().then((data) => {
+          setCartItems(data.CartItem.map((item: CartItem) => item.product));
+          data.CartItem.map((item: CartItem) => {
+            setTotalPrice(
+              (prevState) => prevState + parseInt(item.product.price)
+            );
+          });
+        });
+      });
+    }
+  }, []);
+  React.useEffect(() => {
+    setTotalPrice(cartItems.reduce((sum, item) => sum + item.price, 0));
+  }, [cartItems]);
+
+  //functions for incrementing and decrementing the days
+  const incrementDays = () => {
+    setDays(days + 1);
+  };
+  const decrementDays = () => {
+    if (days > 1) {
+      setDays(days - 1);
+    }
+  };
+  const setDaysTo = (days: number) => {
+    setDays(days);
+  };
   useEffect(() => {
     if (localStorage.getItem("token")) {
       fetch("http://localhost:3001/user/me", {
@@ -37,13 +84,37 @@ const StateContext = ({ children }: any) => {
   }, []);
   let foundProduct: Product | undefined;
   const onAdd = (item: Product) => {
+    if (localStorage.getItem("cartId") === null) {
+      fetch("http://localhost:3001/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          localStorage.setItem("cartId", data.id);
+        });
+    }
     if (cartItems.find((product: Product) => product?.id === item?.id)) {
       return;
     }
-    if (cartItems || item) setCartItems((cartItems) => [...cartItems, item]);
-    setTotalPrice((currPrice) => {
-      return parseInt(item?.price.toString() ?? "0") + currPrice;
-    });
+    if (cartItems || item) {
+      fetch(`http://localhost:3001/cart/${localStorage.getItem("cartId")}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: item.id,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          setCartItems((cartItems) => [...cartItems, data.product]);
+        });
+    }
   };
   const onRemove = (item: Product) => {
     foundProduct = cartItems.find(
@@ -52,13 +123,26 @@ const StateContext = ({ children }: any) => {
     if (!foundProduct) {
       return;
     }
+    fetch(
+      `http://localhost:3001/cart/${localStorage.getItem("cartId")}/${item.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     const newCartItems = cartItems.filter(
       (product: Product) => product?.id !== foundProduct?.id
     );
     setCartItems(newCartItems);
-    setTotalPrice((currPrice) => {
-      return currPrice - parseInt(item?.price.toString() ?? "0");
-    });
+  };
+
+  const isLogin = () => {
+    if (user?.user) {
+      return true;
+    }
+    return false;
   };
   return (
     <Context.Provider
@@ -68,6 +152,11 @@ const StateContext = ({ children }: any) => {
         onAdd,
         onRemove,
         user,
+        incrementDays,
+        decrementDays,
+        days,
+        setDays: setDaysTo,
+        isLogin,
       }}
     >
       {children}

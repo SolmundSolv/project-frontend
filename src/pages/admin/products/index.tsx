@@ -1,3 +1,4 @@
+import { createColumnHelper } from "@tanstack/react-table";
 import { Table } from "flowbite-react";
 import type {
   GetServerSideProps,
@@ -8,6 +9,8 @@ import Link from "next/link";
 import type { ReactElement } from "react";
 import React, { useState } from "react";
 import AdminLayout from "../../../../components/Admin/AdminLayout";
+import SimpleTable from "../../../../components/Admin/SimpleTable";
+import withAuth from "../WithAuth";
 import AddForm from "./AddForm";
 
 type Product = {
@@ -16,66 +19,54 @@ type Product = {
   price: number;
   description: string;
   image: string;
-  category: string;
+  category: { name: string };
 };
+
+const columnHelper = createColumnHelper<Product>();
+
+//react table column def
+const columns = [
+  columnHelper.accessor("name", {
+    cell: (info) => (
+      <Link
+        href={"products/" + info.row.original.id}
+        className="flex text-left"
+      >
+        {info.getValue()}
+      </Link>
+    ),
+    header: () => <span>Name</span>,
+  }),
+  columnHelper.accessor("price", {
+    cell: (info) => info.getValue(),
+    header: () => <span>Price</span>,
+  }),
+  columnHelper.accessor("category.name", {
+    cell: (info) => info.getValue(),
+    header: () => <span>Category</span>,
+  }),
+];
 
 const Products = ({
   products,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element => {
   // const { data: products } = trpc.product.all.useQuery();
-  const [open, setOpen] = useState(false);
+  if (!products) {
+    return <div>Loading...</div>;
+  }
   return (
-    <div>
-      <AddForm open={open} setOpen={setOpen} />
-      <button
-        className="rounded-md bg-blue-500 px-8 py-2 font-medium text-white"
-        onClick={() => setOpen(true)}
-      >
-        Add
-      </button>
-      <div className="p-6">
-        <Table>
-          <Table.Head>
-            <Table.HeadCell>Name</Table.HeadCell>
-            <Table.HeadCell>Price</Table.HeadCell>
-            <Table.HeadCell>Staus</Table.HeadCell>
-          </Table.Head>
-          <Table.Body>
-            {products?.map((res) => {
-              return (
-                <Table.Row key={res?.id}>
-                  <Table.Cell>
-                    <Link
-                      href={"products/[id]"}
-                      as={`products/${res?.id}`}
-                      key={res?.id}
-                    >
-                      {res?.name}
-                    </Link>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Link
-                      href={"products/[id]"}
-                      as={`products/${res?.id}`}
-                      key={res?.id}
-                    >
-                      {res?.price.toString()}
-                    </Link>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Link
-                      href={"products/[id]"}
-                      as={`products/${res?.id}`}
-                      key={res?.id}
-                    >
-                      {res?.description}
-                    </Link>
-                  </Table.Cell>
-                </Table.Row>
-              );
-            })}
-          </Table.Body>
-        </Table>
+    <div className="p-6">
+      <div className="flex justify-between">
+        <span className="text-2xl font-bold">Products</span>
+        <Link
+          href={"products/add"}
+          className="rounded-lg bg-blue-500 px-4 py-2 font-bold text-white "
+        >
+          Add
+        </Link>
+      </div>
+      <div className="mt-6 rounded-lg bg-white p-6 shadow-lg">
+        <SimpleTable tableData={products} columns={columns} />
       </div>
     </div>
   );
@@ -100,9 +91,11 @@ export const getServerSideProps: GetServerSideProps<{
   return { props: { products } };
 };
 
-Products.getLayout = function getLayout(
+const AuthProducts = withAuth(Products);
+
+AuthProducts.getLayout = function getLayout(
   page: ReactElement<InferGetServerSidePropsType<typeof getServerSideProps>>
 ) {
   return <AdminLayout>{page}</AdminLayout>;
 };
-export default Products;
+export default AuthProducts;

@@ -8,6 +8,7 @@ import type { ReactElement } from "react";
 import { useState } from "react";
 import AdminLayout from "../../../../../components/Admin/AdminLayout";
 import type { Employee } from "../../../../types/responses";
+import withAuth from "../../WithAuth";
 
 const UserPage = ({
   employee,
@@ -81,9 +82,10 @@ const UserPage = ({
     </>
   );
 };
+const AuthUserPage = withAuth(UserPage);
 //eslint-disable-next-line
 //@ts-ignore
-UserPage.getLayout = (
+AuthUserPage.getLayout = (
   page: ReactElement<InferGetServerSidePropsType<typeof getServerSideProps>>
 ) => {
   return <AdminLayout>{page}</AdminLayout>;
@@ -106,4 +108,4 @@ export const getServerSideProps: GetServerSideProps<{
   };
 };
 
-export default UserPage;
+export default AuthUserPage;

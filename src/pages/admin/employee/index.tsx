@@ -1,12 +1,14 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Link from "next/link";
-import { ReactElement, useState } from "react";
+import type { ReactElement } from "react";
+import { useState } from "react";
 import AdminLayout from "../../../../components/Admin/AdminLayout";
 import { Employee } from "../../../types/responses";
-import type { NextPageWithLayout } from "../../_app";
 import AddForm from "./AddForm";
-import Table from "./Table";
+import EmployeeTable from "./Table";
+import Image from "next/image";
+import withAuth from "../WithAuth";
 
 const columnHelper = createColumnHelper<Employee>();
 
@@ -15,10 +17,12 @@ const columns = [
     id: "number",
     cell: (info) => (
       <div className="flex">
-        <img
+        <Image
           className="aspect-1 max-w-[50px] rounded-full"
           src={`${info.row.original.avatar}`}
           alt=""
+          width={50}
+          height={50}
         />
         <div className="ml-4 flex flex-col">
           <Link
@@ -138,16 +142,17 @@ const Employee = ({
             </div>
           </div>
           <div className="mt-4">
-            <Table tableData={employee} columns={columns} />
+            <EmployeeTable tableData={employee} columns={columns} />
           </div>
         </div>
       </div>
     </>
   );
 };
+const AuthEmployee = withAuth(Employee);
 //eslint-disable-next-line
 //@ts-ignore
-Employee.getLayout = (
+AuthEmployee.getLayout = (
   page: ReactElement<InferGetServerSidePropsType<typeof getServerSideProps>>
 ) => {
   return <AdminLayout>{page}</AdminLayout>;
@@ -169,4 +174,4 @@ export const getServerSideProps: GetServerSideProps<{
   };
 };
 
-export default Employee;
+export default AuthEmployee;

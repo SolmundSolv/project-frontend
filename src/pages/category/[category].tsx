@@ -1,43 +1,51 @@
-import { useRouter } from "next/router";
+import type { Product } from "../../../src/types/responses";
+import type {
+  GetServerSideProps,
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from "next";
 import type { ReactElement } from "react";
 import React from "react";
-import Item from "../../../components/Store/Item";
 import Layout from "../../../components/Store/Layout";
-import { trpc } from "../../utils/trpc";
-import type { NextPageWithLayout } from "../_app";
+import ItemList from "../../../components/Store/ItemList";
+import { useRouter } from "next/router";
 
-const Category: NextPageWithLayout = () => {
+const Category = ({
+  products,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { category } = router.query;
-  if (category)
-    // eslint-disable-next-line no-var
-    var { data: products, isLoading } = trpc.product.byCategory.useQuery({
-      category: category?.toString(),
-    });
-  if (isLoading || !products)
-    return (
-      <div className="min-h-screen bg-white dark:bg-gray-600">
-        <div className="mx-auto max-w-2xl py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
-          <h2 className="sr-only">Products</h2>
-
-          <div>Loading...</div>
-        </div>
-      </div>
-    );
-
   return (
     <div className="min-h-screen bg-white dark:bg-gray-600">
       <div className="mx-auto max-w-2xl py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h2 className="sr-only">Products</h2>
-
-        <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {products?.map((res) => (
-            <Item item={res} key={res.id} />
-          ))}
+        <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+          {category}
+        </h2>
+        <div className="mt-4 flex gap-6">
+          <ItemList items={products} />
         </div>
       </div>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<{
+  products: Product[];
+}> = async (ctx: GetServerSidePropsContext) => {
+  const category = ctx.query.category;
+  const res2 = await fetch(`http://localhost:3001/model/category/${category}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const products = await res2.json();
+
+  return {
+    props: {
+      products,
+    },
+  };
 };
 
 Category.getLayout = function getLayout(page: ReactElement) {

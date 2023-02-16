@@ -46,7 +46,7 @@ const SimpleTable = (props: { tableData: any[]; columns: any[] }) => {
                   key={header.id}
                   className={classNames(
                     header.index === 0 ? "text-left" : "text-right",
-                    "bg-green-400 p-4"
+                    "p-4 font-bold uppercase text-gray-600"
                   )}
                 >
                   {header.isPlaceholder ? null : (

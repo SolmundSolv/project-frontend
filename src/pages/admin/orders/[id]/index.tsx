@@ -3,14 +3,15 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
 } from "next";
-import Link from "next/link";
 import type { ReactElement } from "react";
 import { useState } from "react";
 import AdminLayout from "../../../../../components/Admin/AdminLayout";
 import ItemPicker from "./ItemPicker";
 import { Order } from "../../../../types/responses";
 import { createColumnHelper } from "@tanstack/react-table";
-import Table from "./Table";
+import Table from "../../../../../components/Admin/Table";
+import { useRouter } from "next/router";
+import withAuth from "../../WithAuth";
 
 export type Product = {
   id: string;
@@ -32,6 +33,11 @@ function deleteProductfromOrder(
 
 function procideOrder(orderId: string): Promise<any> {
   return fetch(`http://localhost:3001/order/${orderId}/procide`, {
+    method: "POST",
+  }).then(() => window.location.reload());
+}
+function completeOrder(orderId: string): Promise<any> {
+  return fetch(`http://localhost:3001/order/${orderId}/completed`, {
     method: "POST",
   }).then(() => window.location.reload());
 }
@@ -73,13 +79,16 @@ const Order = ({
   order,
   products,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   if (!order) return <div>Order not found</div>;
   return (
     <div className="h-full bg-slate-100">
       <div className=" flex justify-between space-x-4 p-6">
-        <Link
-          href="/admin/orders"
+        <button
+          onClick={() => {
+            router.back();
+          }}
           className="flex gap-2 rounded bg-blue-600 px-4 py-2 font-bold text-white"
         >
           <svg
@@ -97,9 +106,9 @@ const Order = ({
             />
           </svg>
           Back
-        </Link>
+        </button>
         <div className="flex gap-4">
-          {order.status.name === "Waiting" ? (
+          {order.status?.name === "Waiting" ? (
             <>
               <button
                 className="rounded bg-blue-600 px-4 py-2 font-bold text-white"
@@ -123,7 +132,7 @@ const Order = ({
               <button
                 className="rounded bg-blue-600 px-4 py-2 font-bold text-white"
                 onClick={() => {
-                  procideOrder(order.id);
+                  completeOrder(order.id);
                 }}
               >
                 Complete
@@ -373,9 +382,11 @@ const Order = ({
     </div>
   );
 };
+
+const AuthOrder = withAuth(Order);
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-Order.getLayout = (
+AuthOrder.getLayout = (
   page: ReactElement<InferGetServerSidePropsType<typeof getServerSideProps>>
 ) => {
   return <AdminLayout>{page}</AdminLayout>;
@@ -408,4 +419,4 @@ export const getServerSideProps: GetServerSideProps<{
   };
 };
 
-export default Order;
+export default AuthOrder;

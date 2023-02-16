@@ -1,7 +1,6 @@
 import { Transition, Dialog } from "@headlessui/react";
 import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from "react";
 import React, { Fragment, useRef, useState } from "react";
-import { trpc } from "../../../utils/trpc";
 
 const AddForm = ({
   open,

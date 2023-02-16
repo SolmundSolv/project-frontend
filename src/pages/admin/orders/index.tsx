@@ -4,8 +4,10 @@ import type { ReactElement } from "react";
 import AdminLayout from "../../../../components/Admin/AdminLayout";
 import dynamic from "next/dynamic";
 import { createColumnHelper } from "@tanstack/react-table";
-import Table from "./Table";
-
+import Table from "../../../../components/Admin/Table";
+import withAuth from "../WithAuth";
+import useSWR from "swr";
+import type { Order } from "../../../types/responses";
 const SingleBarChart = dynamic(
   () => import("../../../../components/Admin/SingleBarChart"),
   {
@@ -18,7 +20,7 @@ const columnHelper = createColumnHelper<Order>();
 const columns = [
   columnHelper.accessor("number", {
     cell: (info) => (
-      <Link href={"orders/[id]"} as={`orders/${info.getValue()}`}>
+      <Link href={"orders/[id]"} as={`orders/${info.row.original.id}`}>
         {info.getValue()}
       </Link>
     ),
@@ -36,19 +38,33 @@ const columns = [
   }),
 ];
 
-export type Order = {
-  id: string;
-  number: number;
-  price: number;
-  status: { name: string };
-  createdAt: string;
-};
-
 const Orders = ({
   inProgress,
   waiting,
   chartData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element => {
+  const fetcher = (url: string, method: string) =>
+    fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => res.json());
+  const {
+    data: waitingData,
+    error: waitingError,
+    isLoading: waitingIsLoading,
+  } = useSWR<Order[]>("http://localhost:3001/order/waiting", fetcher, {
+    refreshInterval: 10000,
+  });
+  const {
+    data: inProgressData,
+    error: inProgressError,
+    isLoading: inProgressIsLoading,
+  } = useSWR<Order[]>("http://localhost:3001/order/in-progress", fetcher, {
+    refreshInterval: 10000,
+  });
+
   if (!inProgress || !waiting) return <div>Orders not found</div>;
   return (
     <div className="grid grid-cols-2 gap-6 bg-slate-100 p-6">
@@ -62,12 +78,24 @@ const Orders = ({
       </div>
       <div className="rounded-lg bg-white p-6 shadow-lg ">
         <h1 className="mb-4 text-2xl font-semibold">Waiting:</h1>
-        <Table columns={columns} tableData={waiting} />
+        {waitingIsLoading ? (
+          <div>Loading...</div>
+        ) : waitingError ? (
+          <div>Error</div>
+        ) : (
+          <Table columns={columns} tableData={waitingData as any} />
+        )}
       </div>
 
       <div className="rounded-lg bg-white p-6 shadow-lg">
         <h1 className="mb-4 text-2xl font-semibold">In Progress:</h1>
-        <Table columns={columns} tableData={inProgress} />
+        {inProgressIsLoading ? (
+          <div>Loading...</div>
+        ) : inProgressError ? (
+          <div>Error</div>
+        ) : (
+          <Table columns={columns} tableData={inProgressData as any} />
+        )}
       </div>
       <div className="col-span-2 rounded-lg bg-white p-6 shadow-lg">
         <h2 className="mb-4 text-xl font-semibold">Last 7 days</h2>
@@ -77,7 +105,9 @@ const Orders = ({
   );
 };
 
-Orders.getLayout = (
+const AuthOrders = withAuth(Orders);
+
+AuthOrders.getLayout = (
   page: ReactElement<InferGetServerSidePropsType<typeof getServerSideProps>>
 ) => {
   return <AdminLayout>{page}</AdminLayout>;
@@ -112,4 +142,4 @@ export const getServerSideProps: GetServerSideProps<{
   return { props: { inProgress, waiting, chartData } };
 };
 
-export default Orders;
+export default AuthOrders;

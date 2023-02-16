@@ -2,35 +2,41 @@ import { Transition, Dialog } from "@headlessui/react";
 import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from "react";
 import React, { Fragment, useRef, useState } from "react";
 
-const AddProduct = ({
+const AddLink = ({
   open,
   setOpen,
-  status,
+  types,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  status: { id: string; name: string }[];
+  types: { name: string }[];
 }): JSX.Element => {
-  const serialRef = useRef<HTMLInputElement>(null);
-  const dateRef = useRef<HTMLInputElement>(null);
-  const statusRef = useRef<HTMLSelectElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const urlRef = useRef<HTMLInputElement>(null);
+  const pathRef = useRef<HTMLInputElement>(null);
+  const typeRef = useRef<HTMLSelectElement>(null);
 
-  function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
-
-    fetch("http://localhost:3001/product", {
+    const name = nameRef.current?.value;
+    const href = urlRef.current?.value;
+    const iconPath = pathRef.current?.value;
+    const type = typeRef.current?.value;
+    const res = await fetch("http://localhost:3001/navigation", {
       method: "POST",
-      body: JSON.stringify({
-        serial: serialRef.current?.value,
-        date: dateRef.current?.value,
-        status: statusRef.current?.value,
-      }),
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        name: name,
+        href: href,
+        iconPath: iconPath,
+        type: type,
+      }),
     });
+    const data = await res.json();
+    console.log(data);
   }
-
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-40 " onClose={setOpen}>
@@ -55,57 +61,59 @@ const AddProduct = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Panel className="absolute top-1/2 left-1/2 flex w-full max-w-md -translate-x-1/2 -translate-y-1/2 flex-col bg-white pb-12 shadow-xl dark:bg-gray-800 dark:text-white">
+            <Dialog.Panel className="absolute top-1/2 left-1/2 flex w-full max-w-md -translate-x-1/2 -translate-y-1/2 flex-col rounded-lg bg-white shadow-xl dark:bg-gray-800 dark:text-white">
               <div className="p-6 ">
                 <form
                   onSubmit={(e) => {
                     onSubmit(e);
+                    setOpen(false);
                   }}
                 >
                   <div className="grid grid-cols-1 grid-rows-[auto]">
-                    <label htmlFor="serialNo" className="font-bold">
-                      Serial Number
+                    <label htmlFor="name" className="font-bold">
+                      Name
                     </label>
                     <input
                       className="rounded-lg border-gray-300"
                       type="text"
                       name="name"
                       id="name"
-                      placeholder="XXXX-XXXX-XXXX-XXXX"
-                      pattern="[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}"
-                      ref={serialRef}
+                      ref={nameRef}
                     />
-                    <label className="font-bold" htmlFor="date">
-                      Bought At
+                    <label className="font-bold" htmlFor="URL">
+                      URL
                     </label>
                     <input
                       className="rounded-lg border-gray-300"
-                      type="date"
-                      name="date"
-                      id="date"
-                      ref={dateRef}
+                      type="text"
+                      name="URL"
+                      id="URL"
+                      ref={urlRef}
                     />
-                    <label className="font-bold" htmlFor="status">
-                      Status
+                    <label className="font-bold" htmlFor="path">
+                      IconPath
                     </label>
-                    <select
+                    <input
                       className="rounded-lg border-gray-300"
-                      name="status"
-                      id="status"
-                      ref={statusRef}
-                    >
-                      {status?.map((res: { id: string; name: string }) => {
-                        return (
-                          <option value={res.id} key={res.id}>
-                            {res.name}
-                          </option>
-                        );
-                      })}
+                      type="text"
+                      name="path"
+                      id="path"
+                      ref={pathRef}
+                    />
+                    <label className="font-bold" htmlFor="'type'">
+                      Type
+                    </label>
+                    <select name="type" id="type" ref={typeRef}>
+                      {types.map((type) => (
+                        <option key={type.name} value={type.name}>
+                          {type.name}
+                        </option>
+                      ))}
                     </select>
 
                     <button
                       type="submit"
-                      className="mt-5 bg-violet-400 px-4 py-2"
+                      className="mt-5 rounded-lg bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-600"
                     >
                       Save
                     </button>
@@ -119,4 +127,5 @@ const AddProduct = ({
     </Transition.Root>
   );
 };
-export default AddProduct;
+
+export default AddLink;

@@ -5,7 +5,6 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-  Table,
 } from "@tanstack/react-table";
 import React from "react";
 function classNames(...classes: any[]) {
@@ -15,7 +14,7 @@ function classNames(...classes: any[]) {
 const Table = (props: { tableData: any[]; columns: any[] }) => {
   const { tableData, columns } = props;
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [data, setData] = React.useState(() => [...tableData]);
+  const [data, setData] = React.useState<any[]>([]);
   const table = useReactTable({
     columns,
     data,
@@ -25,6 +24,21 @@ const Table = (props: { tableData: any[]; columns: any[] }) => {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
+  React.useEffect(() => {
+    if (tableData[Symbol.iterator] === undefined || !tableData[0]) {
+      setData([]);
+    } else {
+      setData(() => [...tableData]);
+    }
+  }, [tableData]);
+
+  if (tableData[Symbol.iterator] === undefined || !tableData[0]) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="text-2xl font-bold">No data</div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -71,7 +85,7 @@ const Table = (props: { tableData: any[]; columns: any[] }) => {
                 <td
                   key={cell.id}
                   className={classNames(
-                    cell.column.id === "number" ? "text-left" : "text-right",
+                    cell.column.getStart() === 0 ? "text-left" : "text-right",
                     "mx-4 border border-slate-200 px-4 py-2 font-semibold"
                   )}
                 >
