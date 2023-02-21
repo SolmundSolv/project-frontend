@@ -20,7 +20,7 @@ const ProductPage = ({
     <div className="grid min-h-screen gap-4 bg-slate-50 p-6 dark:bg-gray-600 lg:grid-cols-2">
       <div>
         <Image
-          src={`/img/${product.img}`}
+          src={`http://localhost:3001/image/${product.img}`}
           alt={product?.img}
           width={800}
           height={800}

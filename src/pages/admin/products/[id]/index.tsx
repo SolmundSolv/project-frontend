@@ -129,6 +129,18 @@ const ExactProduct = ({
     } else {
       alert(res.statusText);
     }
+    const formData = new FormData();
+    formData.append("media", selectedFile as File);
+
+    fetch("http://localhost:3001/image/upload", {
+      method: "POST",
+      body: formData,
+    });
+    if (res.ok) {
+      router.push("/admin/products");
+    } else {
+      alert(res.statusText);
+    }
   }
   if (!product) return <div>loading...</div>;
   if (!all) all = [];
@@ -138,7 +150,9 @@ const ExactProduct = ({
         <div className="flex flex-col rounded-lg border bg-white p-6 shadow-md">
           <span className="text-xl font-bold">Thumbnail</span>
           <Image
-            src={imageSrc?.preview || "/img/" + product?.img}
+            src={
+              imageSrc?.preview || "http://localhost:3001/image/" + product?.img
+            }
             alt="product"
             width={300}
             height={300}

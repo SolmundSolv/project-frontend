@@ -5,16 +5,15 @@ import React from "react";
 import AdminLayout from "../../../../components/Admin/AdminLayout";
 import Table from "../../../../components/Admin/Table";
 import withAuth from "../WithAuth";
-import AddLink from "./AddLink";
+import AddPages from "./AddPages";
 
-type NavLink = {
-  id: string;
+type PageType = {
   name: string;
   href: string;
-  iconPath: string;
+  title: string;
 };
 
-const columnHelper = createColumnHelper<NavLink>();
+const columnHelper = createColumnHelper<PageType>();
 
 const columns = [
   columnHelper.accessor("name", {
@@ -25,25 +24,12 @@ const columns = [
     cell: (info) => info.getValue(),
     header: () => <span>URL</span>,
   }),
-  columnHelper.accessor("iconPath", {
-    cell: (info) => {
-      return (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="mr-4 h-6 w-6"
-        >
-          <g dangerouslySetInnerHTML={{ __html: info.getValue() }}></g>
-        </svg>
-      );
-    },
-    header: () => <span>Icon</span>,
+  columnHelper.accessor("title", {
+    cell: (info) => info.getValue(),
+    header: () => <span>Title</span>,
   }),
 ];
-const NavigationPage = ({
+const PageWithPages = ({
   admin,
   store,
   types,
@@ -75,7 +61,7 @@ const NavigationPage = ({
           </svg>
           Add
         </button>
-        <AddLink open={open} setOpen={setOpen} types={types} />
+        <AddPages open={open} setOpen={setOpen} types={types} />
       </div>
       <div className="grid grid-cols-2">
         <div className="">
@@ -143,23 +129,23 @@ const NavigationPage = ({
 };
 
 export const getServerSideProps: GetServerSideProps<{
-  admin: NavLink[];
-  store: NavLink[];
+  admin: PageType[];
+  store: PageType[];
   types: { name: string }[];
 }> = async () => {
-  const res1 = await fetch("http://localhost:3001/navigation/type/Admin", {
+  const res1 = await fetch("http://localhost:3001/page/type/Admin", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
-  const res2 = await fetch("http://localhost:3001/navigation/type/Store", {
+  const res2 = await fetch("http://localhost:3001/page/type/Store", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
-  const res3 = await fetch("http://localhost:3001/navigation/type", {
+  const res3 = await fetch("http://localhost:3001/page/type", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -178,10 +164,10 @@ export const getServerSideProps: GetServerSideProps<{
   };
 };
 
-const AuthNavigation = withAuth(NavigationPage);
+const AuthPages = withAuth(PageWithPages);
 
-AuthNavigation.getLayout = (page: ReactElement) => {
+AuthPages.getLayout = (page: ReactElement) => {
   return <AdminLayout>{page}</AdminLayout>;
 };
 
-export default AuthNavigation;
+export default AuthPages;

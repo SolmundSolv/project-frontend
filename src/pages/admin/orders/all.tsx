@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import React from "react";
-import type { Order } from ".";
+import type { Order } from "../../../types/responses";
 import AdminLayout from "../../../../components/Admin/AdminLayout";
 import withAuth from "../WithAuth";
-import Table from "./Table";
+import Table from "../../../../components/Admin/Table";
 const columnHelper = createColumnHelper<Order>();
 
 const columns = [

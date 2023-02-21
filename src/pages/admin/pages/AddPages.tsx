@@ -2,7 +2,7 @@ import { Transition, Dialog } from "@headlessui/react";
 import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from "react";
 import React, { Fragment, useRef, useState } from "react";
 
-const AddLink = ({
+const AddPages = ({
   open,
   setOpen,
   types,
@@ -13,16 +13,16 @@ const AddLink = ({
 }): JSX.Element => {
   const nameRef = useRef<HTMLInputElement>(null);
   const urlRef = useRef<HTMLInputElement>(null);
-  const pathRef = useRef<HTMLInputElement>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
   const typeRef = useRef<HTMLSelectElement>(null);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     const name = nameRef.current?.value;
     const href = urlRef.current?.value;
-    const iconPath = pathRef.current?.value;
+    const title = titleRef.current?.value;
     const type = typeRef.current?.value;
-    const res = await fetch("http://localhost:3001/navigation", {
+    const res = await fetch("http://localhost:3001/page", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,7 +30,7 @@ const AddLink = ({
       body: JSON.stringify({
         name: name,
         href: href,
-        iconPath: iconPath,
+        title: title,
         type: type,
       }),
     });
@@ -61,7 +61,7 @@ const AddLink = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Panel className="absolute top-1/2 left-1/2 flex w-full max-w-md -translate-x-1/2 -translate-y-1/2 flex-col rounded-lg bg-white shadow-xl ">
+            <Dialog.Panel className="absolute top-1/2 left-1/2 flex w-full max-w-md -translate-x-1/2 -translate-y-1/2 flex-col rounded-lg bg-white shadow-xl dark:bg-gray-800 dark:text-white">
               <div className="p-6 ">
                 <form
                   onSubmit={(e) => {
@@ -90,15 +90,15 @@ const AddLink = ({
                       id="URL"
                       ref={urlRef}
                     />
-                    <label className="font-bold" htmlFor="path">
-                      IconPath
+                    <label className="font-bold" htmlFor="title">
+                      Title
                     </label>
                     <input
                       className="rounded-lg border-gray-300"
                       type="text"
-                      name="path"
-                      id="path"
-                      ref={pathRef}
+                      name="title"
+                      id="title"
+                      ref={titleRef}
                     />
                     <label className="font-bold" htmlFor="'type'">
                       Type
@@ -128,4 +128,4 @@ const AddLink = ({
   );
 };
 
-export default AddLink;
+export default AddPages;

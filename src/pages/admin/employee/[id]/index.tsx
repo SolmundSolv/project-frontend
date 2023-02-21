@@ -74,8 +74,13 @@ const UserPage = ({
               </div>
             </div>
           </div>
-          <div className="h-full w-full rounded-xl bg-white p-6 shadow-xl">
-            <span>Time Off Request</span>
+          <div className="grid grid-flow-row gap-6">
+            <div className="w-full rounded-xl bg-white p-6 shadow-xl">
+              <span>Time Off Request</span>
+            </div>
+            <div className="w-full rounded-xl bg-white p-6 shadow-xl">
+              <span>Time Off Request</span>
+            </div>
           </div>
         </div>
       </div>
@@ -83,8 +88,6 @@ const UserPage = ({
   );
 };
 const AuthUserPage = withAuth(UserPage);
-//eslint-disable-next-line
-//@ts-ignore
 AuthUserPage.getLayout = (
   page: ReactElement<InferGetServerSidePropsType<typeof getServerSideProps>>
 ) => {

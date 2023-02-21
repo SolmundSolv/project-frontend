@@ -14,19 +14,36 @@ export default function LoginBtn() {
   if (isLogin()) {
     return (
       <>
-        <a
-          className="text-sm font-medium"
-          href={`/account/${localStorage.getItem("token")}`}
-        >
-          {ctx?.user?.user.name ?? ""}
-        </a>{" "}
-        <br />
+        {ctx?.user?.user?.isEmployee ? (
+          <Link className="text-sm font-medium" href={`/admin/profile`}>
+            {ctx?.user?.user.name ?? ""}
+          </Link>
+        ) : (
+          <Link
+            className="text-sm font-medium"
+            href={`/account/${localStorage.getItem("token")}`}
+          >
+            {ctx?.user?.user.name ?? ""}
+          </Link>
+        )}
+        {/* <br /> */}
         <button
-          className="text-sm font-medium"
+          className="text-left text-sm font-medium"
           type="submit"
           onClick={() => {
-            localStorage.removeItem("token");
-            window.location.reload();
+            fetch("http://localhost:3001/auth/logout", {
+              method: "POST",
+
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                token: localStorage.getItem("token"),
+              }),
+            }).then(() => {
+              localStorage.removeItem("token");
+              window.location.reload();
+            });
           }}
         >
           Sign out

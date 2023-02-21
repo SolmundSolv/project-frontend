@@ -17,11 +17,11 @@ const Category = ({
   const { category } = router.query;
   return (
     <div className="min-h-screen bg-white dark:bg-gray-600">
-      <div className="mx-auto max-w-2xl py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
+      <div className="mx-auto max-w-2xl py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:p-8">
         <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
           {category}
         </h2>
-        <div className="mt-4 flex gap-6">
+        <div className="mt-4 flex flex-col gap-6">
           <ItemList items={products} />
         </div>
       </div>

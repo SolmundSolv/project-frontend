@@ -9,9 +9,8 @@ import type {
 import { ChangeEvent, ReactElement, useRef, useState } from "react";
 import React from "react";
 import AdminLayout from "../../../../components/Admin/AdminLayout";
-import SimpleTable from "../../../../components/Admin/SimpleTable";
+import Table from "../../../../components/Admin/Table";
 import AddAttribute from "./AddAttribute";
-import AddProduct from "./AddProduct";
 import { useRouter } from "next/router";
 import withAuth from "../WithAuth";
 
@@ -113,7 +112,7 @@ const NewProduct = ({
     const formData = new FormData();
     formData.append("media", selectedFile);
 
-    fetch("/api/uploadFile", {
+    fetch("http://localhost:3001/image/upload", {
       method: "POST",
       body: formData,
     });
@@ -279,7 +278,7 @@ const NewProduct = ({
             </button>
           </div>
           <div className="mt-6">
-            <SimpleTable tableData={all} columns={columns} />
+            <Table tableData={all} columns={columns} />
           </div>
         </div>
       </div>

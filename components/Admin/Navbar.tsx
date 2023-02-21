@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import LoginBtn from "./LoginBtn";
+import LoginBtn from "../LoginBtn";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,19 +44,7 @@ function Navbar() {
             </button>
             {isOpen && (
               <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md shadow-lg">
-                <div className="shadow-xs rounded-md bg-white py-1">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
-                  >
-                    Edit profile
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
-                  >
-                    Change password
-                  </a>
+                <div className="shadow-xs flex flex-col gap-2 rounded-md bg-white p-2 text-left text-black">
                   <LoginBtn />
                 </div>
               </div>

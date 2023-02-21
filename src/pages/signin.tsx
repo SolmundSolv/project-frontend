@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useRef } from "react";
 
@@ -71,9 +72,17 @@ const Signin = () => {
             required
           />
         </div>
-        <button className="rounded-lg bg-yellow-400 py-2 px-4 text-white hover:bg-yellow-300">
-          Login
-        </button>
+        <div className="flex justify-between">
+          <button className="rounded-lg bg-yellow-400 py-2 px-4 text-white hover:bg-yellow-300">
+            Login
+          </button>
+          <Link
+            href={"/signup"}
+            className="text-sm text-blue-500 hover:underline"
+          >
+            You can also create an account
+          </Link>
+        </div>
       </form>
     </div>
   );

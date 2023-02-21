@@ -19,48 +19,30 @@ const AddForm = ({
   const roleRef = useRef<HTMLSelectElement>(null);
   const [selectedFile, setSelectedFile] = useState<File>();
 
-  function handleChange(event: ChangeEvent<HTMLInputElement>) {
-    if (!event.target.files) return;
-    setSelectedFile(event.target.files[0]);
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+
+    if (selectedFile) {
+      fetch("http://localhost:3001/product", {
+        method: "POST",
+        body: JSON.stringify({
+          name: nameRef.current?.value,
+          email: emailRef.current?.value,
+          phone: phoneRef.current?.value,
+          address: addressRef.current?.value,
+          city: cityRef.current?.value,
+          zip: zipRef.current?.value,
+          country: countryRef.current?.value,
+          roleId: roleRef.current?.value,
+          status: "active",
+          avatar: "placeholder.jpg",
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
   }
-  // function onSubmit(e: FormEvent) {
-  //   e.preventDefault();
-
-  //   if (selectedFile) {
-  //     fetch("http://localhost:3001/product", {
-  //       method: "POST",
-  //       body: JSON.stringify({
-  //         name: nameRef.current?.value,
-  //         price: parseInt(priceRef.current?.value ?? "0"),
-  //         description: descripionRef.current?.value,
-  //         category: catRef.current?.value,
-  //         img: selectedFile.name,
-  //         isActive: true,
-  //       }),
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     // adding.mutate({
-  //     //   name: nameRef.current?.value ?? "",
-  //     //   price: parseFloat(priceRef.current?.value ?? "0") ?? 0,
-  //     //   img: selectedFile.name,
-  //     //   description: descripionRef.current?.value ?? "",
-  //     //   categoryId: catRef.current?.value,
-  //     // });
-  //     const formData = new FormData();
-  //     formData.append("media", selectedFile);
-
-  //     fetch("/api/uploadFile", {
-  //       method: "POST",
-  //       body: formData,
-  //     });
-  //     setOpen(false);
-
-  //     formData.delete("media");
-  //     // formData.delete("fileName");
-  //   }
-  // }
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -98,7 +80,7 @@ const AddForm = ({
                   </button>
                 </div>
                 <div className="p-6">
-                  <form>
+                  <form onSubmit={onSubmit}>
                     <div className="flex flex-col">
                       <label
                         htmlFor="name"

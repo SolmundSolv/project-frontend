@@ -9,7 +9,7 @@ const Footer = () => {
           <Link href="#" className="flex items-center">
             <>
               <img
-                src="https://sicz.eu/onewebstatic/6208a9db93-Logo%20Sicz%20Const.png"
+                src="/img/Logo.png"
                 className="mr-3 h-32"
                 alt="SiczConstruction Logo"
               />

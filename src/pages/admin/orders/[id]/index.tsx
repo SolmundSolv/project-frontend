@@ -12,6 +12,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import Table from "../../../../../components/Admin/Table";
 import { useRouter } from "next/router";
 import withAuth from "../../WithAuth";
+import Link from "next/link";
 
 export type Product = {
   id: string;
@@ -42,34 +43,39 @@ function completeOrder(orderId: string): Promise<any> {
   }).then(() => window.location.reload());
 }
 
-type Products = Order["products"] extends (infer U)[] ? U : never;
+type Products = Order["ProductHistory"] extends (infer U)[] ? U : never;
 
 const columnHelper = createColumnHelper<Products>();
 
 const columns = [
-  columnHelper.accessor("Model.name", {
+  columnHelper.accessor("Product.Model.name", {
     cell: (info) => (
       <div className="flex gap-2">
         <img
-          src={`/img/${info.row.original.Model.img}`}
+          src={`/img/${info.row.original.Product.Model.img}`}
           width="50"
           height="50"
           alt=""
         />{" "}
-        <span className="self-center">{info.getValue()}</span>
+        <Link
+          href={"/admin/equipment/" + info.row.original.Product.id}
+          className="self-center"
+        >
+          {info.getValue()}
+        </Link>
       </div>
     ),
     header: () => <span>Product</span>,
   }),
-  columnHelper.accessor("serialNumer", {
+  columnHelper.accessor("Product.serialNumer", {
     cell: (info) => <div className="text-right">{info.getValue()}</div>,
     header: () => <span>Product</span>,
   }),
-  columnHelper.accessor("Model.category.name", {
+  columnHelper.accessor("Product.Model.category.name", {
     cell: (info) => <div className="text-right">{info.getValue()}</div>,
     header: () => <span>Category</span>,
   }),
-  columnHelper.accessor("Model.price", {
+  columnHelper.accessor("Product.Model.price", {
     cell: (info) => <div className="text-right">${info.getValue()}</div>,
     header: () => <span>Price</span>,
   }),
@@ -127,7 +133,7 @@ const Order = ({
                 Procide
               </button>
             </>
-          ) : (
+          ) : order.status?.name === "In Progress" ? (
             <>
               <button
                 className="rounded bg-blue-600 px-4 py-2 font-bold text-white"
@@ -138,10 +144,16 @@ const Order = ({
                 Complete
               </button>
             </>
+          ) : (
+            <></>
           )}
-          <button className="rounded bg-red-600 px-4 py-2 font-bold text-white">
-            Cancel
-          </button>
+          {order.status?.name === "Ended" ? (
+            <></>
+          ) : (
+            <button className="rounded bg-red-600 px-4 py-2 font-bold text-white">
+              Cancel
+            </button>
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-8 p-6">
@@ -368,7 +380,7 @@ const Order = ({
           <span className="text-2xl font-bold text-gray-800">
             Order #{order.number}
           </span>
-          <Table columns={columns} tableData={order.products} />
+          <Table columns={columns} tableData={order.ProductHistory} />
           <span className="text-right font-bold">Total: ${order.price}</span>
         </div>
       </div>

@@ -14,6 +14,7 @@ type User = {
       country: string;
       building: string;
     };
+    isEmployee: boolean;
   };
 };
 
@@ -40,11 +41,14 @@ const StateContext = ({ children }: any) => {
   const [days, setDays] = useState(1);
 
   React.useEffect(() => {
-    if (localStorage.getItem("cartId") !== null) {
-      fetch(
-        `http://localhost:3001/cart/${localStorage.getItem("cartId")}`
-      ).then((res) => {
+    if (user) {
+      fetch(`http://localhost:3001/cart/${user?.user?.id}`, {}).then((res) => {
         res.json().then((data) => {
+          localStorage.setItem("cartId", data.id);
+          console.log(data);
+          if (!data.CartItem) {
+            return;
+          }
           setCartItems(data.CartItem.map((item: CartItem) => item.product));
           data.CartItem.map((item: CartItem) => {
             setTotalPrice(
@@ -54,7 +58,7 @@ const StateContext = ({ children }: any) => {
         });
       });
     }
-  }, []);
+  }, [user]);
   React.useEffect(() => {
     setTotalPrice(cartItems.reduce((sum, item) => sum + item.price, 0));
   }, [cartItems]);
@@ -84,6 +88,7 @@ const StateContext = ({ children }: any) => {
   }, []);
   let foundProduct: Product | undefined;
   const onAdd = (item: Product) => {
+    console.log(localStorage.getItem("cartId"));
     if (localStorage.getItem("cartId") === null) {
       fetch("http://localhost:3001/cart", {
         method: "POST",

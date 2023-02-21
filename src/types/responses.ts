@@ -20,6 +20,20 @@ export type Order = {
     };
   };
   status: { name: string };
+  ProductHistory: {
+    id: string;
+    Product: {
+      id: string;
+      serialNumer: string;
+      Model: {
+        id: string;
+        name: string;
+        img: string;
+        price: number;
+        category: { name: string };
+      };
+    };
+  }[];
   products: {
     id: string;
     serialNumer: string;
@@ -58,11 +72,35 @@ export type Employee = {
   password: string;
   token: string;
   lastLogin: string;
-  Position: string;
+  Position: {
+    id: string;
+    name: string;
+  };
   positionId: string;
-  Salary: string;
-  salaryId: string;
-  bonus: string;
+  Salary: {
+    id: string;
+    createdAt: string;
+    basic: number;
+    bonus: number;
+    taxes: number;
+    payDate: string;
+    employeeId: string;
+    currencyId: string;
+    salaryStatusId: string;
+    Currency: {
+      id: string;
+      createdAt: string;
+      name: string;
+      status: string;
+    };
+    SalaryStatus: {
+      id: string;
+      createdAt: string;
+      name: string;
+      status: string;
+    };
+  }[];
+  KanbanTask: KanbanTask[];
 };
 
 export type Kanban = {
@@ -133,6 +171,7 @@ export interface KanbanTask {
   KanbanTaskAttachment: KanbanTaskAttachment[];
   KanbanTaskChecklist: KanbanTaskChecklist[];
   KanbanTaskComment: any[];
+  Employee: Employee[];
 }
 
 export type Equipment = {
@@ -190,4 +229,18 @@ export type CartItem = {
     description: string;
     img: string;
   };
+};
+
+export type Comment = {
+  id: string;
+  KanbanTaskCommentLabel: {
+    id: string;
+    name: string;
+  }[];
+  KanbanTaskCommentAttachment: {
+    id: string;
+    name: string;
+  }[];
+  createdAt: string;
+  Employee: Employee;
 };

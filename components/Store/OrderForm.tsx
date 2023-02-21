@@ -64,10 +64,10 @@ const OrderForm: NextPage = () => {
         body: JSON.stringify(body),
       }).then((res) => {
         if (res.ok) {
+          localStorage.removeItem("cartId");
           router.push("/confirm/" + data.id);
         }
       });
-      localStorage.removeItem("cartId");
     }
   }
   return (

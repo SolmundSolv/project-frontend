@@ -4,6 +4,9 @@ import AdminLayout from "../../../../../components/Admin/AdminLayout";
 import type { KanbanTask } from "../../../../types/responses";
 import withAuth from "../../WithAuth";
 import Comments from "./CommentSection";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import AddEmpolyee from "./AddEmployee";
 
 function statusDesign(status: string) {
   switch (status) {
@@ -37,6 +40,9 @@ function handleChecklistItem(id: string, checked: boolean) {
 const TaskPage = ({
   kanban,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element => {
+  const router = useRouter();
+  const { id } = router.query;
+  const [open, setOpen] = React.useState(false);
   return (
     <div className="h-full w-full  bg-slate-100 p-6">
       <h1 className="text-2xl font-bold">Task Details</h1>
@@ -77,41 +83,34 @@ const TaskPage = ({
             </div>
           </section>
           <section className="row-start-2 rounded-lg border border-gray-200 bg-white p-6 shadow-lg">
-            <h2 className="font-mono font-bold uppercase">Assaign to</h2>
+            <div className="flex justify-between">
+              <h2 className="font-mono font-bold uppercase">Assaign to</h2>
+              <button
+                className="rounded-lg bg-blue-600 px-4 py-2 font-bold text-white"
+                onClick={() => setOpen((prev) => !prev)}
+              >
+                Add
+              </button>
+              <AddEmpolyee open={open} setOpen={setOpen} id={id as string} />
+            </div>
             <div className="mt-6 flex flex-col gap-2">
-              <div className="flex gap-4">
-                <img
-                  src="https://unsplash.it/200/200"
-                  alt="user"
-                  className="my-auto h-8 w-8 rounded-full"
-                />
-                <div>
-                  <p className="font-bold">John Doe</p>
-                  <p className="font-semibold text-gray-500">UI/UX Designer</p>
+              {kanban.Employee.map((employee) => (
+                <div className="flex gap-4" key={employee.id}>
+                  <Image
+                    src={employee.avatar}
+                    alt="user"
+                    className="my-auto h-8 w-8 rounded-full"
+                    width={32}
+                    height={32}
+                  />
+                  <div>
+                    <p className="font-bold">{employee.name}</p>
+                    <p className="font-semibold text-gray-500">
+                      {employee.role.name}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex gap-4">
-                <img
-                  src="https://unsplash.it/200/200"
-                  alt="user"
-                  className="my-auto h-8 w-8 rounded-full"
-                />
-                <div>
-                  <p className="font-bold">John Doe</p>
-                  <p className="font-semibold text-gray-500">UI/UX Designer</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <img
-                  src="https://unsplash.it/200/200"
-                  alt="user"
-                  className="my-auto h-8 w-8 rounded-full"
-                />
-                <div>
-                  <p className="font-bold">John Doe</p>
-                  <p className="font-semibold text-gray-500">UI/UX Designer</p>
-                </div>
-              </div>
+              ))}
             </div>
           </section>
         </div>

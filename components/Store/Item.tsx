@@ -13,7 +13,7 @@ export default function Item(item: { item: Product }): JSX.Element {
         <div className="group border border-gray-700 p-2 shadow-md md:p-4">
           <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200 xl:aspect-w-7 xl:aspect-h-8">
             <Image
-              src={`/img/${item.item.img}`}
+              src={`http://localhost:3001/image/${item.item.img}`}
               width={300}
               height={300}
               alt={item.item.description}

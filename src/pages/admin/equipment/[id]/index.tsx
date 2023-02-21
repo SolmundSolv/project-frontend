@@ -20,6 +20,7 @@ const EquipmentPage = ({
   product,
   maintence,
   maintenanceStatus,
+  history,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element => {
   const [status, setStatus] = useState<string>(product?.ProductStatus.name);
   const nameRef = useRef<HTMLInputElement>(null);
@@ -79,7 +80,7 @@ const EquipmentPage = ({
         <div className="flex flex-col rounded-lg border bg-white p-6 shadow-md">
           <span className="text-xl font-bold">Thumbnail</span>
           <Image
-            src={"/img/" + product?.Model.img}
+            src={"http://localhost:3001/image/" + product?.Model.img}
             alt="product"
             width={300}
             height={300}
@@ -178,7 +179,7 @@ const EquipmentPage = ({
           </div>
         </div>
         <div className="flex flex-col rounded-lg border bg-white p-6 shadow-md">
-          <span className="text-xl font-bold">History</span>
+          <span className="text-xl font-bold">History of Maintenance</span>
           <table className="w-full table-fixed">
             {maintence.map((item, index) => (
               <tr className="border-b border-gray-200 p-5" key={index}>
@@ -207,6 +208,33 @@ const EquipmentPage = ({
                 <td>
                   <span className="font-semibold text-gray-700">
                     {item.createdAt.split("T")[0]}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </table>
+        </div>
+        <div className="flex flex-col rounded-lg border bg-white p-6 shadow-md">
+          <span className="text-xl font-bold">History of Orders</span>
+          <table className="mt-2 w-full table-fixed">
+            {history.map((item, index) => (
+              <tr className="border-b border-gray-200 p-5" key={index}>
+                <td className="py-2">
+                  <Link
+                    href={"/admin/orders/" + item.Order.id}
+                    className="cursor-pointer font-semibold text-gray-700 hover:underline"
+                  >
+                    Order #{item.Order.number}
+                  </Link>
+                </td>
+                <td>
+                  <span className="font-semibold text-gray-700">
+                    {item.Order.createdAt.split("T")[0]}
+                  </span>
+                </td>
+                <td>
+                  <span className="font-semibold text-gray-700">
+                    {item.Order.rentDays} days
                   </span>
                 </td>
               </tr>
@@ -266,6 +294,16 @@ export const getServerSideProps: GetServerSideProps<{
   product: Equipment;
   maintence: Maintence[];
   maintenanceStatus: { id: string; name: string }[];
+  history: {
+    id: string;
+    Order: {
+      id: string;
+      number: string;
+      createdAt: string;
+      price: number;
+      rentDays: number;
+    };
+  }[];
 }> = async (ctx: GetServerSidePropsContext) => {
   const { id } = ctx.query;
   const res = await fetch(`http://localhost:3001/product/${id}`, {
@@ -293,7 +331,15 @@ export const getServerSideProps: GetServerSideProps<{
   });
   const maintenanceStatus = await res3.json();
 
-  return { props: { product, maintence, maintenanceStatus } };
+  const res4 = await fetch(`http://localhost:3001/product/history/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const history = await res4.json();
+
+  return { props: { product, maintence, maintenanceStatus, history } };
 };
 
 export default AuthEquipmentPage;

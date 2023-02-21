@@ -4,6 +4,7 @@ import { useStateContext } from "../../../context/StateContext";
 import type { NextComponentType } from "next/types";
 import { NextPageWithLayout } from "../_app";
 import { Dialog } from "@headlessui/react";
+import Link from "next/link";
 
 interface WithAuthProps {
   getLayout?: (page: React.ReactElement) => React.ReactElement;
@@ -15,7 +16,7 @@ const withAuth = (WrappedComponent: NextPageWithLayout<any>) => {
     const ctx = useStateContext();
     useEffect(() => {
       const checkLogin = async () => {
-        if (!ctx?.user?.user) {
+        if (!ctx?.user?.user.isEmployee) {
           setIsLoggedIn(false);
         } else {
           setIsLoggedIn(true);
@@ -35,15 +36,28 @@ const withAuth = (WrappedComponent: NextPageWithLayout<any>) => {
           open={true}
         >
           <div className="flex flex-col items-center justify-center">
-            <h1 className="text-2xl font-bold">You are not logged in</h1>
-            <button
-              className="rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
-              onClick={() => {
-                Router.push("/signin?callbackUrl=" + Router.asPath);
-              }}
-            >
-              Login
-            </button>
+            <h1 className="text-2xl font-bold">
+              You are not logged in or you are not employee
+            </h1>
+            <h3 className="text-sm font-medium text-gray-500">
+              If you think this is mistake contact with administrator
+            </h3>
+            <div className="flex gap-2">
+              <button
+                className="rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
+                onClick={() => {
+                  Router.push("/signin?callbackUrl=" + Router.asPath);
+                }}
+              >
+                Login
+              </button>
+              <Link
+                href={"/"}
+                className="rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
+              >
+                Back to home
+              </Link>
+            </div>
           </div>
         </Dialog>
       );
