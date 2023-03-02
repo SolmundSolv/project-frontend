@@ -6,17 +6,19 @@ import type { Order } from "../../types/responses";
 import { Transition } from "@headlessui/react";
 import Link from "next/link";
 import EditForm from "./EditForm";
-import { useRouter } from "next/router";
+import ChangePassword from "./ChangePassword";
 
 const Account = () => {
   const ctx = useStateContext();
   const [orders, setOrders] = React.useState<Order[]>();
   const [loading, setLoading] = React.useState(true);
   const [open, setOpen] = React.useState(false);
+  const [open2, setOpen2] = React.useState(false);
   const [edit, setEdit] = React.useState(false);
 
   const formRef = React.useRef<HTMLFormElement>(null);
   const streetRef = React.useRef<HTMLInputElement>(null);
+  const buildingRef = React.useRef<HTMLInputElement>(null);
   const cityRef = React.useRef<HTMLInputElement>(null);
   const numberRef = React.useRef<HTMLInputElement>(null);
   const zipRef = React.useRef<HTMLInputElement>(null);
@@ -52,6 +54,7 @@ const Account = () => {
         name: user?.name,
         email: user?.email,
         phone: user?.phone,
+        building: buildingRef.current?.value,
         street: streetRef.current?.value,
         city: cityRef.current?.value,
         number: numberRef.current?.value,
@@ -59,7 +62,7 @@ const Account = () => {
         country: countryRef.current?.value,
       }),
     }).then(() => {
-      setOpen(false);
+      alert("Address Updated");
     });
   }
 
@@ -94,7 +97,7 @@ const Account = () => {
             <div>
               <button
                 type="button"
-                className="inline-flex items-center rounded-md border border-transparent bg-gray-500 px-4 py-2 font-medium text-white shadow-sm hover:bg-yellow-400"
+                className="inline-flex items-center rounded-md border border-transparent bg-gray-300 px-4 py-2 font-medium shadow-sm hover:bg-yellow-400 dark:bg-gray-500 dark:text-white"
                 onClick={() => setEdit(true)}
               >
                 Edit
@@ -142,12 +145,13 @@ const Account = () => {
                   ********
                 </dd>
                 <dfn className="text-sm text-gray-500 dark:text-gray-400">
-                  <Link
-                    href="/account/password"
+                  <button
                     className=" hover:text-yellow-400 dark:hover:text-gray-300"
+                    onClick={() => setOpen2(true)}
                   >
                     Change password
-                  </Link>
+                  </button>
+                  <ChangePassword open={open2} setOpen={setOpen2} />
                 </dfn>
               </div>
             </dl>
@@ -164,7 +168,7 @@ const Account = () => {
               </p>
             </div>
             <button
-              className="rounded py-2 px-4 font-bold text-white hover:bg-gray-600"
+              className="rounded bg-gray-300 py-2 px-4 font-bold text-gray-800 dark:bg-gray-700 dark:text-white"
               onClick={() => setOpen((prev) => !prev)}
             >
               <svg
@@ -192,7 +196,7 @@ const Account = () => {
               </svg>
             </button>
           </div>
-          <div className="overflow-hidden">
+          <div className="overflow-hidden shadow-md">
             <Transition
               className="border-t border-gray-200 bg-white shadow transition-all duration-500 dark:border-gray-600 dark:bg-gray-700"
               show={open}
@@ -247,7 +251,7 @@ const Account = () => {
           </div>
         </div>
 
-        <div className="overflow-hidden bg-white shadow dark:bg-gray-700 sm:rounded-lg ">
+        <div className="bg-white shadow dark:bg-gray-700 sm:rounded-lg ">
           <div className="flex justify-between px-4 py-5 sm:px-6">
             <div>
               <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
@@ -258,7 +262,7 @@ const Account = () => {
               </p>
             </div>
             <label
-              className="flex cursor-pointer items-center justify-center rounded bg-gray-500 px-4 font-medium text-white hover:bg-yellow-400"
+              className="flex cursor-pointer items-center justify-center rounded bg-gray-300 px-4 font-medium hover:bg-yellow-400 dark:bg-gray-500 dark:text-white"
               htmlFor="submitBtn"
             >
               Update
@@ -319,7 +323,7 @@ const Account = () => {
                     id="building"
                     autoComplete="address-line2"
                     defaultValue={user.adress?.building}
-                    ref={numberRef}
+                    ref={buildingRef}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-500 dark:bg-gray-600 dark:text-gray-100 sm:text-sm"
                   />
                 </div>

@@ -33,16 +33,6 @@ const columns = [
     cell: (info) => info.getValue().split("T")[0],
     header: () => <span>Date</span>,
   }),
-  columnHelper.accessor("id", {
-    cell: (info) => {
-      return (
-        <button className="rounded-lg bg-blue-500 py-2 px-4 font-bold text-white">
-          Edit
-        </button>
-      );
-    },
-    header: () => <span>Edit</span>,
-  }),
 ];
 
 const Email = ({

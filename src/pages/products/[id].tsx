@@ -43,14 +43,20 @@ const ProductPage = ({
         </div>
         <div className="mt-8 flex flex-grow flex-col gap-6">
           <button
-            className="flex-grow rounded-xl border-2 border-yellow-400 bg-white px-8 py-2 font-bold text-yellow-400"
+            className="flex-grow rounded-xl border-2 border-yellow-400 bg-white px-8 py-2 font-bold text-yellow-400 disabled:bg-gray-300 disabled:text-black"
             onClick={() => ctx?.onAdd(product)}
+            {...(product?.availableQuantity === 0 && {
+              disabled: true,
+            })}
           >
             Add to cart
           </button>
           <Link
             href="/cart"
-            className="flex-grow rounded-xl border-2  border-yellow-400 bg-yellow-400 px-8 py-2 text-center font-bold text-white"
+            className={
+              "flex-grow rounded-xl border-2  border-yellow-400 bg-yellow-400 px-8 py-2 text-center font-bold text-white disabled:bg-gray-300 " +
+              (product?.availableQuantity === 0 ? "pointer-events-none" : "")
+            }
             onClick={() => ctx?.onAdd(product)}
           >
             Order now

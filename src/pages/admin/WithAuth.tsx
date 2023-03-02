@@ -16,7 +16,7 @@ const withAuth = (WrappedComponent: NextPageWithLayout<any>) => {
     const ctx = useStateContext();
     useEffect(() => {
       const checkLogin = async () => {
-        if (!ctx?.user?.user.isEmployee) {
+        if (!ctx?.user?.user?.isEmployee) {
           setIsLoggedIn(false);
         } else {
           setIsLoggedIn(true);

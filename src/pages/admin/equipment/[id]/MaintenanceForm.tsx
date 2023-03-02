@@ -109,7 +109,7 @@ const MaintenanceForm = ({
             <Dialog.Panel className="absolute top-1/2 left-1/2 flex w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col rounded-lg bg-white shadow-xl dark:bg-gray-800 dark:text-white">
               <div className="p-6 ">
                 <div className="flex justify-between">
-                  <h1 className="text-2xl font-bold">Add User</h1>
+                  <h1 className="text-2xl font-bold">Add Maintenance</h1>
                   <button
                     className="font-semibold text-gray-600"
                     onClick={() => setOpen(false)}
@@ -156,6 +156,7 @@ const MaintenanceForm = ({
                         name="status"
                         id="status"
                         className="rounded-md border-none bg-gray-100 p-2"
+                        defaultValue={"xxx"}
                         onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                           setStatus({
                             id: e.target.value,

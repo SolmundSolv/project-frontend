@@ -2,36 +2,43 @@ import { Transition, Dialog } from "@headlessui/react";
 import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from "react";
 import React, { Fragment, useRef, useState } from "react";
 
-const AddPages = ({
+const AddSection = ({
   open,
   setOpen,
-  types,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  types: { name: string }[];
 }): JSX.Element => {
-  const nameRef = useRef<HTMLInputElement>(null);
-  const urlRef = useRef<HTMLInputElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
-  const typeRef = useRef<HTMLSelectElement>(null);
+  const valueRef = useRef<HTMLTextAreaElement>(null);
+  const pathRef = useRef<HTMLInputElement>(null);
+  const pageRef = useRef<HTMLSelectElement>(null);
+  const [pages, setPages] = useState<{ id: string; name: string }[]>([]);
+  const [selectedPage, setSelectedPage] = useState<{
+    id: string;
+  }>({ id: "" });
+  React.useEffect(() => {
+    fetch("http://localhost:3001/page")
+      .then((res) => res.json())
+      .then((data) => {
+        setPages(data);
+      });
+  }, []);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const name = nameRef.current?.value;
-    const href = urlRef.current?.value;
     const title = titleRef.current?.value;
-    const type = typeRef.current?.value;
-    fetch("http://localhost:3001/page", {
+    const value = valueRef.current?.value;
+    const path = pathRef.current?.value;
+    fetch("http://localhost:3001/page/section/" + selectedPage.id, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        name: name,
-        href: href,
-        title: title,
-        type: type,
+        name: title,
+        value: value,
+        iconPath: path,
       }),
     }).then((res) => {
       if (res.ok) {
@@ -75,45 +82,54 @@ const AddPages = ({
                 >
                   <div className="grid grid-cols-1 grid-rows-[auto]">
                     <label htmlFor="name" className="font-bold">
-                      Name
+                      Title
                     </label>
                     <input
                       className="rounded-lg border-gray-300"
                       type="text"
                       name="name"
                       id="name"
-                      ref={nameRef}
-                    />
-                    <label className="font-bold" htmlFor="URL">
-                      URL
-                    </label>
-                    <input
-                      className="rounded-lg border-gray-300"
-                      type="text"
-                      name="URL"
-                      id="URL"
-                      ref={urlRef}
-                    />
-                    <label className="font-bold" htmlFor="title">
-                      Title
-                    </label>
-                    <input
-                      className="rounded-lg border-gray-300"
-                      type="text"
-                      name="title"
-                      id="title"
                       ref={titleRef}
                     />
-                    <label className="font-bold" htmlFor="'type'">
-                      Type
+                    <label className="font-bold" htmlFor="icon">
+                      Icon
                     </label>
-                    <select name="type" id="type" ref={typeRef}>
-                      {types.map((type) => (
-                        <option key={type.name} value={type.name}>
-                          {type.name}
+                    <input
+                      className="rounded-lg border-gray-300"
+                      type="text"
+                      name="icon"
+                      id="icon"
+                      ref={pathRef}
+                    />
+                    <label className="font-bold" htmlFor="title">
+                      Page
+                    </label>
+                    <select
+                      name="page"
+                      id="page"
+                      ref={pageRef}
+                      onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                        setSelectedPage({
+                          id: e.target.value,
+                        });
+                      }}
+                    >
+                      {pages.map((page) => (
+                        <option key={page.id} value={page.id}>
+                          {page.name}
                         </option>
                       ))}
                     </select>
+
+                    <label className="font-bold" htmlFor="title">
+                      Value
+                    </label>
+                    <textarea
+                      className="rounded-lg border-gray-300"
+                      name="title"
+                      id="title"
+                      ref={valueRef}
+                    />
 
                     <button
                       type="submit"
@@ -132,4 +148,4 @@ const AddPages = ({
   );
 };
 
-export default AddPages;
+export default AddSection;

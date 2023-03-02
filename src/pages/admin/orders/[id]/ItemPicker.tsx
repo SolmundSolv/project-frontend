@@ -93,16 +93,16 @@ const ItemPicker = ({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <Dialog.Panel className="relative z-40 mx-auto my-8 w-full max-w-2xl rounded-lg bg-white shadow-xl">
-              <div className="p-6">
-                <table>
+            <Dialog.Panel className="absolute top-1/2 left-1/2 flex w-full max-w-md -translate-x-1/2 -translate-y-1/2 flex-col rounded-lg bg-white shadow-xl">
+              <div className="w-full p-6">
+                <table className="w-full">
                   <thead>
                     {table.getHeaderGroups().map((headerGroup) => (
                       <tr key={headerGroup.id}>
                         {headerGroup.headers.map((header) => (
                           <th key={header.id}>
                             {header.isPlaceholder ? null : (
-                              <div>
+                              <div className="uppercase text-gray-400">
                                 {flexRender(
                                   header.column.columnDef.header,
                                   header.getContext()
@@ -116,7 +116,12 @@ const ItemPicker = ({
                   </thead>
                   <tbody>
                     {table.getRowModel().rows.map((row) => (
-                      <tr key={row.id} className={" hover:bg-slate-300"}>
+                      <tr
+                        key={row.id}
+                        className={
+                          " text-center font-medium hover:bg-slate-300"
+                        }
+                      >
                         {row.getVisibleCells().map((cell) => (
                           <td key={cell.id}>
                             {flexRender(
@@ -130,9 +135,9 @@ const ItemPicker = ({
                   </tbody>
                 </table>
               </div>
-              <div>
+              <div className="p-6">
                 <button
-                  className="mb-2 rounded border p-2"
+                  className="mb-2 rounded border bg-blue-500 p-2 font-bold text-white"
                   onClick={() => {
                     const products = table
                       .getSelectedRowModel()
@@ -175,6 +180,10 @@ function handleSubmit(
     },
     //send products and price to backend
     body: JSON.stringify({ selectedProducts, price }),
+  }).then((res) => {
+    if (res.ok) {
+      window.location.reload();
+    }
   });
 }
 

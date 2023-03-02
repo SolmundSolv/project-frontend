@@ -17,7 +17,7 @@ const Home = ({
     <div className="min-h-screen bg-white dark:bg-gray-600">
       <div className="mx-auto grid max-w-2xl gap-6 py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8 lg:py-8">
         <Image
-          src="/img/banner.jpg"
+          src="http://localhost:3001/image/banner.jpg"
           alt="banner"
           className="w-full object-cover"
           width={1920}

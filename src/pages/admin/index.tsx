@@ -129,9 +129,15 @@ export const getServerSideProps: GetServerSideProps<{
   const maintenanceCount = await res5.json();
 
   const res6 = await fetch(
-    `${process.env.FETCH_URL}/maintenance/scheduled/count`
+    `${process.env.FETCH_URL}/product/maintenance/scheduled/count`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
   );
-  const maintenanceScheduledCount = 0;
+  const maintenanceScheduledCount = await res6.json();
 
   const res7 = await fetch(
     `${process.env.FETCH_URL}/product/maintenance/cost`,

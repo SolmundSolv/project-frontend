@@ -1,46 +1,54 @@
 import { Transition, Dialog } from "@headlessui/react";
-import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from "react";
-import React, { Fragment, useRef, useState } from "react";
+import type { Dispatch, FormEvent, SetStateAction } from "react";
+import React, { Fragment, useRef } from "react";
 
-const AddPages = ({
+const AddTimeoffRequest = ({
   open,
   setOpen,
-  types,
+  id,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  types: { name: string }[];
+  id: string;
 }): JSX.Element => {
-  const nameRef = useRef<HTMLInputElement>(null);
-  const urlRef = useRef<HTMLInputElement>(null);
-  const titleRef = useRef<HTMLInputElement>(null);
-  const typeRef = useRef<HTMLSelectElement>(null);
+  const dateStartRef = useRef<HTMLInputElement>(null);
+  const dateEndRef = useRef<HTMLInputElement>(null);
+  const reasonRef = useRef<HTMLInputElement>(null);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const name = nameRef.current?.value;
-    const href = urlRef.current?.value;
-    const title = titleRef.current?.value;
-    const type = typeRef.current?.value;
-    fetch("http://localhost:3001/page", {
+    if (dateStartRef.current?.value === undefined) {
+      alert("Start date is required");
+      return;
+    }
+    if (dateEndRef.current?.value === undefined) {
+      alert("End date is required");
+      return;
+    }
+    if (dateStartRef.current?.value > dateEndRef.current?.value) {
+      alert("Start date must be before end date");
+      return;
+    }
+
+    const res = await fetch("http://localhost:3001/employee/timeoffrequest", {
       method: "POST",
+      body: JSON.stringify({
+        employeeId: id,
+        startDate: dateStartRef.current?.valueAsDate,
+        endDate: dateEndRef.current?.valueAsDate,
+        reason: reasonRef.current?.value,
+      }),
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        name: name,
-        href: href,
-        title: title,
-        type: type,
-      }),
-    }).then((res) => {
-      if (res.ok) {
-        window.location.reload();
-      } else {
-        console.log("error");
-      }
     });
+    if (res.ok) {
+      window.location.reload();
+    } else {
+      console.log("error");
+    }
   }
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-40 " onClose={setOpen}>
@@ -74,46 +82,33 @@ const AddPages = ({
                   }}
                 >
                   <div className="grid grid-cols-1 grid-rows-[auto]">
-                    <label htmlFor="name" className="font-bold">
-                      Name
+                    <label htmlFor="start" className="font-bold">
+                      From
+                    </label>
+                    <input
+                      className="rounded-lg border-gray-300"
+                      type="date"
+                      name="start"
+                      ref={dateStartRef}
+                    />
+                    <label className="end" htmlFor="date">
+                      To
+                    </label>
+                    <input
+                      className="rounded-lg border-gray-300"
+                      type="date"
+                      name="end"
+                      ref={dateEndRef}
+                    />
+                    <label className="font-bold" htmlFor="status">
+                      Reason
                     </label>
                     <input
                       className="rounded-lg border-gray-300"
                       type="text"
-                      name="name"
-                      id="name"
-                      ref={nameRef}
+                      name="end"
+                      ref={reasonRef}
                     />
-                    <label className="font-bold" htmlFor="URL">
-                      URL
-                    </label>
-                    <input
-                      className="rounded-lg border-gray-300"
-                      type="text"
-                      name="URL"
-                      id="URL"
-                      ref={urlRef}
-                    />
-                    <label className="font-bold" htmlFor="title">
-                      Title
-                    </label>
-                    <input
-                      className="rounded-lg border-gray-300"
-                      type="text"
-                      name="title"
-                      id="title"
-                      ref={titleRef}
-                    />
-                    <label className="font-bold" htmlFor="'type'">
-                      Type
-                    </label>
-                    <select name="type" id="type" ref={typeRef}>
-                      {types.map((type) => (
-                        <option key={type.name} value={type.name}>
-                          {type.name}
-                        </option>
-                      ))}
-                    </select>
 
                     <button
                       type="submit"
@@ -131,5 +126,4 @@ const AddPages = ({
     </Transition.Root>
   );
 };
-
-export default AddPages;
+export default AddTimeoffRequest;

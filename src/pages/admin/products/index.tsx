@@ -1,5 +1,4 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import { Table } from "flowbite-react";
 import type {
   GetServerSideProps,
   GetServerSidePropsContext,
@@ -9,9 +8,8 @@ import Link from "next/link";
 import type { ReactElement } from "react";
 import React, { useState } from "react";
 import AdminLayout from "../../../../components/Admin/AdminLayout";
-import SimpleTable from "../../../../components/Admin/SimpleTable";
+import Table from "../../../../components/Admin/Table";
 import withAuth from "../WithAuth";
-import AddForm from "./AddForm";
 
 type Product = {
   id: string;
@@ -66,7 +64,7 @@ const Products = ({
         </Link>
       </div>
       <div className="mt-6 rounded-lg bg-white p-6 shadow-lg">
-        <SimpleTable tableData={products} columns={columns} />
+        <Table tableData={products} columns={columns} />
       </div>
     </div>
   );

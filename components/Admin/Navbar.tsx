@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React, { useState } from "react";
 import LoginBtn from "../LoginBtn";
 
@@ -9,18 +10,12 @@ function Navbar() {
   };
 
   return (
-    <nav className="max-w-screen flex bg-gray-800 text-white ">
-      <div className="container flex items-center justify-between px-4 py-3 align-bottom">
+    <nav className="max-w-screen flex bg-gray-800 text-white">
+      <div className="container mx-auto flex items-center justify-between px-4 py-3 align-bottom">
         <a href="#" className="text-xl font-bold">
           Admin Dashboard
         </a>
         <div>
-          <a
-            href="#"
-            className="rounded-full px-3 py-2 text-sm font-semibold hover:bg-gray-700"
-          >
-            Settings
-          </a>
           <div className="relative inline-block text-left">
             <button
               onClick={toggleMenu}
@@ -44,8 +39,14 @@ function Navbar() {
             </button>
             {isOpen && (
               <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md shadow-lg">
-                <div className="shadow-xs flex flex-col gap-2 rounded-md bg-white p-2 text-left text-black">
+                <div
+                  className="shadow-xs flex flex-col gap-2 rounded-md bg-white p-2 text-left text-black"
+                  onClick={toggleMenu}
+                >
                   <LoginBtn />
+                  <Link href="/" className="text-sm font-medium">
+                    Store
+                  </Link>
                 </div>
               </div>
             )}

@@ -52,33 +52,16 @@ const TaskPage = ({
             <h2 className="font-mono font-bold uppercase">information</h2>
             <div className="mt-6 grid grid-cols-2 gap-4">
               <div className="w-full border-b border-gray-200 pb-2 font-semibold">
-                Task No
+                Task ID
               </div>
-              <div className="w-full border-b border-gray-200 pb-2 ">#1244</div>
+              <div className="w-full overflow-hidden border-b border-gray-200 pb-2 font-medium text-gray-700">
+                ID-{kanban.id}
+              </div>
               <div className="w-full border-b border-gray-200 pb-2 font-semibold">
                 Task Title
               </div>
-              <div className="w-full border-b border-gray-200 pb-2 ">
+              <div className="w-full border-b border-gray-200 pb-2 font-medium text-gray-700">
                 {kanban?.name}
-              </div>
-              <div className="w-full border-b border-gray-200 pb-2 font-semibold">
-                Status
-              </div>
-              <div className="w-full border-b border-gray-200 pb-2 ">
-                <span
-                  className={
-                    "rounded px-2 py-1 font-semibold " +
-                    statusDesign("In progress")
-                  }
-                >
-                  In progress
-                </span>
-              </div>
-              <div className="w-full border-b border-gray-200 pb-2 font-semibold">
-                Due Date
-              </div>
-              <div className="w-full border-b border-gray-200 pb-2 ">
-                01-03-2023
               </div>
             </div>
           </section>
@@ -122,20 +105,6 @@ const TaskPage = ({
                 {kanban?.KanbanTaskAttachment[0]?.name}
               </p>
             </div>
-            <div className="mt-8">
-              <h2 className="font-mono font-bold uppercase">Tasks Tags</h2>
-              <div className="flex flex-wrap gap-2">
-                <span className="rounded-lg bg-gray-100 px-2 py-1 text-sm font-bold text-gray-500">
-                  Tag 1
-                </span>
-                <span className="rounded-lg bg-gray-100 px-2 py-1 text-sm font-bold text-gray-500">
-                  Tag 2
-                </span>
-                <span className="rounded-lg bg-gray-100 px-2 py-1 text-sm font-bold text-gray-500">
-                  Tag 3
-                </span>
-              </div>
-            </div>
           </section>
           <section className="rounded-lg border border-gray-100 bg-white p-6 shadow-lg">
             <h2 className="font-mono font-bold uppercase">Sub-Tasks</h2>
@@ -150,7 +119,7 @@ const TaskPage = ({
                           name="1"
                           id=""
                           className="my-auto checked:line-through"
-                          checked={item.checked}
+                          defaultChecked={item.checked}
                           onClick={(e) => {
                             e.currentTarget.checked = !item.checked;
                             handleChecklistItem(item.id, item.checked);

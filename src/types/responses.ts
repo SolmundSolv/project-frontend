@@ -100,6 +100,15 @@ export type Employee = {
       status: string;
     };
   }[];
+  TimeOffRequest: {
+    id: string;
+    start: string;
+    end: string;
+    reason: string;
+    RequestStatus: {
+      name: string;
+    };
+  }[];
   KanbanTask: KanbanTask[];
 };
 
@@ -113,6 +122,8 @@ export type Kanban = {
     createdAt: string;
     KanbanTaskLabel: { name: string }[];
     KanbanTaskAttachment: { name: string }[];
+    KanbanTaskComment: { name: string }[];
+    Employee: { name: string }[];
   }[];
 };
 
@@ -243,4 +254,15 @@ export type Comment = {
   }[];
   createdAt: string;
   Employee: Employee;
+};
+
+export type PageSection = {
+  id: string;
+  name: string;
+  value: string;
+  iconPath?: string;
+  Page: {
+    id: string;
+    name: string;
+  };
 };

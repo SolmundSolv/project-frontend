@@ -1,13 +1,11 @@
 import { Transition, Dialog } from "@headlessui/react";
-import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from "react";
-import React, { Fragment, useRef, useState } from "react";
+import type { Dispatch, FormEvent, SetStateAction } from "react";
+import React, { Fragment, useRef } from "react";
 
 type SingleProduct = {
-  id: string;
   serialNumer: string;
-  boughtAt: string;
+  boughtAt: Date;
   warranty: string;
-  ProductStatus: { name: string };
 };
 
 const AddProduct = ({
@@ -15,40 +13,55 @@ const AddProduct = ({
   setOpen,
   status,
   model,
-  all,
-  setAll,
+  setModel,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   status: { id: string; name: string }[];
-  model: string;
-  all: SingleProduct[];
-  setAll: Dispatch<SetStateAction<SingleProduct[]>>;
+  model: string | SingleProduct[];
+  setModel?: Dispatch<SetStateAction<SingleProduct[]>>;
 }): JSX.Element => {
   const serialRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
   const statusRef = useRef<HTMLSelectElement>(null);
+  let onSubmit: (e: FormEvent) => Promise<void>;
 
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault();
+  if (typeof model === "string") {
+    onSubmit = async (e: FormEvent) => {
+      e.preventDefault();
 
-    const res = await fetch("http://localhost:3001/product", {
-      method: "POST",
-      body: JSON.stringify({
-        model: model,
-        serialNumber: serialRef.current?.value,
-        dateOfPurchase: dateRef.current?.valueAsDate,
-        status: statusRef.current?.value,
-        warranty: "2021-12-31",
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (res.ok) {
-      window.location.reload();
-    } else {
-      console.log("error");
+      const res = await fetch("http://localhost:3001/product", {
+        method: "POST",
+        body: JSON.stringify({
+          model: model,
+          serialNumber: serialRef.current?.value,
+          dateOfPurchase: dateRef.current?.valueAsDate,
+          status: statusRef.current?.value,
+          warranty: "2021-12-31",
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        console.log("error");
+      }
+    };
+  } else {
+    if (setModel) {
+      onSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        setModel([
+          ...model,
+          {
+            serialNumer: serialRef.current?.value || "",
+            boughtAt: dateRef.current?.valueAsDate || new Date(),
+            warranty: "2021-12-31",
+          },
+        ]);
+      };
     }
   }
 
@@ -76,7 +89,7 @@ const AddProduct = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Panel className="absolute top-1/2 left-1/2 flex w-full max-w-md -translate-x-1/2 -translate-y-1/2 flex-col rounded-lg bg-white shadow-xl dark:bg-gray-800 dark:text-white">
+            <Dialog.Panel className="absolute top-1/2 left-1/2 flex w-full max-w-md -translate-x-1/2 -translate-y-1/2 flex-col rounded-lg bg-white shadow-xl">
               <div className="p-6 ">
                 <form
                   onSubmit={(e) => {

@@ -16,32 +16,48 @@ const AddForm = ({
   const cityRef = useRef<HTMLInputElement>(null);
   const zipRef = useRef<HTMLInputElement>(null);
   const countryRef = useRef<HTMLInputElement>(null);
-  const roleRef = useRef<HTMLSelectElement>(null);
   const [selectedFile, setSelectedFile] = useState<File>();
+  const [roles, setRoles] = React.useState<{ id: string; name: string }[]>();
+  const roleRef = useRef<HTMLSelectElement>(null);
+
+  React.useEffect(() => {
+    fetch(`http://localhost:3001/employee/roles`)
+      .then((res) => res.json())
+      .then((data) => {
+        setRoles(data);
+      });
+  }, []);
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
 
-    if (selectedFile) {
-      fetch("http://localhost:3001/product", {
-        method: "POST",
-        body: JSON.stringify({
-          name: nameRef.current?.value,
-          email: emailRef.current?.value,
-          phone: phoneRef.current?.value,
-          address: addressRef.current?.value,
-          city: cityRef.current?.value,
-          zip: zipRef.current?.value,
-          country: countryRef.current?.value,
-          roleId: roleRef.current?.value,
-          status: "active",
-          avatar: "placeholder.jpg",
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    }
+    fetch("http://localhost:3001/employee", {
+      method: "POST",
+      body: JSON.stringify({
+        name: nameRef.current?.value,
+        email: emailRef.current?.value,
+        phone: phoneRef.current?.value,
+        address: addressRef.current?.value,
+        city: cityRef.current?.value,
+        zip: zipRef.current?.value,
+        country: countryRef.current?.value,
+        roleId: roleRef.current?.value,
+        status: "active",
+        avatar: "placeholder.jpg",
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => {
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        console.log("error");
+      }
+    });
+  }
+  if (!roles) {
+    return <></>;
   }
 
   return (
@@ -193,8 +209,11 @@ const AddForm = ({
                         ref={roleRef}
                         className="rounded-md border-none bg-gray-100 p-2"
                       >
-                        <option value="admin">Admin </option>
-                        <option value="user">User</option>
+                        {roles.map((role) => (
+                          <option key={role.id} value={role.id}>
+                            {role.name}
+                          </option>
+                        ))}
                       </select>
                       <div className="mt-8 flex justify-center">
                         <button
@@ -204,10 +223,7 @@ const AddForm = ({
                         >
                           Discard
                         </button>
-                        <button
-                          type="submit"
-                          className="rounded-md bg-blue-500 px-4 py-3 font-semibold text-white"
-                        >
+                        <button className="rounded-md bg-blue-500 px-4 py-3 font-semibold text-white">
                           Submit
                         </button>
                       </div>

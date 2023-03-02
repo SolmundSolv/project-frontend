@@ -301,7 +301,7 @@ const ExactProduct = ({
         </div>
         <div className="flex flex-col rounded-lg border bg-white p-6 shadow-md">
           <div className="flex justify-between">
-            <span className="text-xl font-bold">Products</span>
+            <span className="text-xl font-bold">Equipment</span>
             <button
               className="rounded-lg bg-blue-500 py-2 px-4 font-bold text-white"
               onClick={() => setOpenProduct(true)}
@@ -313,8 +313,6 @@ const ExactProduct = ({
               setOpen={setOpenProduct}
               status={status}
               model={product?.id}
-              all={exactProduct}
-              setAll={setExactProduct}
             />
           </div>
           <div className="mt-6">

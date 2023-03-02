@@ -58,7 +58,7 @@ const Cart = ({
                         if (parseInt(e.target.value) < 1) ctx?.setDays(1);
                         if (parseInt(e.target.value) > 60) ctx?.setDays(60);
                       }}
-                      className="ml-2 h-10 w-16 rounded-lg border-none bg-gray-800 font-semibold dark:text-gray-200"
+                      className="ml-2 h-10 w-16 rounded-lg border-none font-semibold dark:bg-gray-800 dark:text-gray-200"
                     />
                     <button
                       onClick={() => ctx?.incrementDays()}
@@ -82,7 +82,7 @@ const Cart = ({
                     >
                       <div className="flex items-center">
                         <Image
-                          src={"/img/" + item.img}
+                          src={"http://localhost:3001/image/" + item.img}
                           alt={item.name}
                           width={50}
                           height={50}

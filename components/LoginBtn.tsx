@@ -15,9 +15,17 @@ export default function LoginBtn() {
     return (
       <>
         {ctx?.user?.user?.isEmployee ? (
-          <Link className="text-sm font-medium" href={`/admin/profile`}>
-            {ctx?.user?.user.name ?? ""}
-          </Link>
+          <>
+            <Link className="text-sm font-medium" href={`/admin/profile`}>
+              Employee
+            </Link>
+            <Link
+              className="text-sm font-medium"
+              href={`/account/${localStorage.getItem("token")}`}
+            >
+              User
+            </Link>
+          </>
         ) : (
           <Link
             className="text-sm font-medium"
@@ -42,6 +50,7 @@ export default function LoginBtn() {
               }),
             }).then(() => {
               localStorage.removeItem("token");
+              localStorage.removeItem("cartId");
               window.location.reload();
             });
           }}

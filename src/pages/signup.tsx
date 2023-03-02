@@ -14,18 +14,23 @@ const Signup = () => {
         email: emailRef.current?.value,
         password: passwordRef.current?.value,
       };
-      const res = await fetch("http://localhost:3001/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      const result = await res.json();
-      if (result.statusCode == 403)
-        alert(`Account with email ${emailRef.current?.value} already exist`);
-      else if (result.access_token) {
-        window.location.href = "/signin";
+      try {
+        const res = await fetch("http://localhost:3001/auth/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+        const result = await res.json();
+        if (result.statusCode == 400) alert(result.message);
+        else if (result.statusCode == 403)
+          alert(`Account with email ${emailRef.current?.value} already exist`);
+        else if (result.access_token) {
+          window.location.href = "/signin";
+        }
+      } catch (error) {
+        console.log(error);
       }
     }
   }

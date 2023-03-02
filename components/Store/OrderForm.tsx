@@ -14,6 +14,7 @@ const OrderForm: NextPage = () => {
   const zipRef = useRef<HTMLInputElement>(null);
   const countryRef = useRef<HTMLInputElement>(null);
   const buildingRef = useRef<HTMLInputElement>(null);
+  const startRentRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -28,6 +29,7 @@ const OrderForm: NextPage = () => {
       price: ctx?.totalPrice && ctx?.days ? ctx?.totalPrice * ctx?.days : 0,
       items: products,
       rentDays: ctx?.days ?? 0,
+      rentStart: startRentRef.current?.valueAsDate,
       address: addressRef.current?.value,
       city: cityRef.current?.value,
       zip: zipRef.current?.value,
@@ -64,8 +66,9 @@ const OrderForm: NextPage = () => {
         body: JSON.stringify(body),
       }).then((res) => {
         if (res.ok) {
-          localStorage.removeItem("cartId");
-          router.push("/confirm/" + data.id);
+          router.push(
+            "/payment?orderId=" + data?.id + "&days=" + data?.rentDays
+          );
         }
       });
     }
@@ -74,9 +77,21 @@ const OrderForm: NextPage = () => {
     <form id="contact-form" onSubmit={onSubmit}>
       <div className="overflow-hidden border-b border-gray-200 shadow dark:border-gray-800 sm:rounded-md">
         <div className="bg-white px-4 py-5 dark:bg-gray-600 sm:p-6">
-          <h2 className="text-center text-2xl font-bold text-gray-900 dark:text-white">
-            Credenitals
-          </h2>
+          <div className="flex justify-between">
+            <h2 className="text-center text-2xl font-bold text-gray-900 dark:text-white">
+              Credenitals
+            </h2>
+            <div className="grid items-center">
+              <span className="font-medium text-gray-700 dark:text-white">
+                Start Date:
+              </span>
+              <input
+                type="date"
+                ref={startRentRef}
+                className="rounded-lg text-gray-700 dark:bg-gray-400 dark:text-white"
+              />
+            </div>
+          </div>
           <div className="grid grid-cols-6 gap-6">
             <div className="col-span-6 sm:col-span-6">
               <label

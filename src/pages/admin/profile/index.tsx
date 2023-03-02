@@ -6,12 +6,10 @@ import withAuth from "../WithAuth";
 import Image from "next/image";
 import { createColumnHelper } from "@tanstack/react-table";
 import Table from "../../../../components/Admin/Table";
+import AddTimeoffRequest from "./AddTimeoffRequest";
 
 type Incomes = Employee["Salary"] extends (infer U)[] ? U : never;
-type Tasks = Employee["KanbanTask"] extends (infer U)[] ? U : never;
-
 const columnHelperIncomes = createColumnHelper<Incomes>();
-const columnHelperTasks = createColumnHelper<Tasks>();
 
 const columnsIncomes = [
   columnHelperIncomes.accessor("basic", {
@@ -36,6 +34,8 @@ const columnsIncomes = [
     header: () => <span>Status</span>,
   }),
 ];
+type Tasks = Employee["KanbanTask"] extends (infer U)[] ? U : never;
+const columnHelperTasks = createColumnHelper<Tasks>();
 
 const columnsTasks = [
   columnHelperTasks.accessor("name", {
@@ -52,6 +52,7 @@ const ProfilePage = () => {
   const ctx = useStateContext();
   const user = ctx?.user?.user;
   const [employee, setEmployee] = React.useState<Employee>();
+  const [open, setOpen] = React.useState(false);
   React.useEffect(() => {
     fetch("http://localhost:3001/employee/" + user?.id, {
       method: "GET",
@@ -65,33 +66,43 @@ const ProfilePage = () => {
       });
   }, [user?.id]);
   if (!employee) return <div>Employee not found</div>;
+  if (!user) return <div>User not found</div>;
   return (
     <div className="p-6">
-      <div className="flex rounded-lg bg-white p-6 shadow-md">
-        <Image
-          src={employee?.avatar}
-          width={200}
-          height={200}
-          alt={employee?.avatar}
-        />
-        <div className="ml-6">
-          <div className="mb-2">
-            <span className="text-lg font-medium text-gray-800">
-              {employee?.name}
-            </span>
-          </div>
-          <div className="mb-2 text-sm font-medium text-gray-500">
-            {employee?.role.name} • {employee?.email}
-          </div>
-          <div className="mb-2 flex flex-col border border-gray-200 p-4">
-            <div className="font-bold">
-              {employee?.Salary.reduce((acc, cur) => acc + cur.basic, 0)} +{" "}
-              {employee?.Salary.reduce((acc, cur) => acc + cur.bonus, 0)}{" "}
-              {employee?.Salary[0]?.Currency.status}
+      <div className="flex justify-between rounded-lg bg-white p-6 shadow-md">
+        <div className="flex">
+          <Image
+            src={employee?.avatar}
+            width={200}
+            height={200}
+            alt={employee?.avatar}
+          />
+          <div className="ml-6">
+            <div className="mb-2">
+              <span className="text-lg font-medium text-gray-800">
+                {employee?.name}
+              </span>
             </div>
-            <span className="font-medium text-gray-500">Income</span>
+            <div className="mb-2 text-sm font-medium text-gray-500">
+              {employee?.role.name} • {employee?.email}
+            </div>
+            <div className="mb-2 flex flex-col border border-gray-200 p-4">
+              <div className="font-bold">
+                {employee?.Salary.reduce((acc, cur) => acc + cur.basic, 0)} +{" "}
+                {employee?.Salary.reduce((acc, cur) => acc + cur.bonus, 0)}{" "}
+                {employee?.Salary[0]?.Currency.status}
+              </div>
+              <span className="font-medium text-gray-500">Income</span>
+            </div>
           </div>
         </div>
+        <button
+          className="self-start bg-blue-500 px-4 py-2 font-bold text-white"
+          onClick={() => setOpen(true)}
+        >
+          TimeOff request
+        </button>
+        <AddTimeoffRequest open={open} setOpen={setOpen} id={user.id} />
       </div>
       <div className="mt-6 flex flex-col rounded-lg bg-white p-6 shadow-md">
         <h3 className="text-2xl font-bold">Incomes</h3>

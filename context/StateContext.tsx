@@ -45,7 +45,6 @@ const StateContext = ({ children }: any) => {
       fetch(`http://localhost:3001/cart/${user?.user?.id}`, {}).then((res) => {
         res.json().then((data) => {
           localStorage.setItem("cartId", data.id);
-          console.log(data);
           if (!data.CartItem) {
             return;
           }
@@ -82,7 +81,14 @@ const StateContext = ({ children }: any) => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
-        .then((res) => res.json())
+        .then((res) => {
+          if (res.status === 401) {
+            localStorage.removeItem("token");
+            setUser(null);
+          } else {
+            return res.json();
+          }
+        })
         .then((data) => setUser(data));
     }
   }, []);

@@ -1,7 +1,7 @@
 import AdminLayout from "../../../../components/Admin/AdminLayout";
 import type { NextPageWithLayout } from "../../_app";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { Kanban } from "../../../types/responses";
 import AddForm from "./AddForm";
@@ -14,6 +14,8 @@ type Task = {
   createdAt: string;
   KanbanTaskLabel: { name: string }[];
   KanbanTaskAttachment: { name: string }[];
+  KanbanTaskComment: { name: string }[];
+  Employee: { name: string }[];
 };
 
 function KanbanBoard({
@@ -37,7 +39,12 @@ function KanbanBoard({
       </div>
       <div className="mb-4 max-h-[560px] overflow-hidden hover:overflow-auto">
         {tasks?.map((task) => (
-          <Task comments={0} workers={0} key={task.id} {...task} />
+          <Task
+            comments={task.KanbanTaskComment.length}
+            workers={task.Employee.length}
+            key={task.id}
+            {...task}
+          />
         ))}
       </div>
       <button
@@ -144,16 +151,42 @@ function Task({
 const Tasks = ({
   kanban,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element => {
+  const textRef = useRef<HTMLInputElement>(null);
   if (!kanban) {
     return <div>Loading...</div>;
   }
+
   return (
-    <div className="h-full bg-slate-100 p-6 font-mono">
+    <div className="h-full bg-slate-100 p-6">
+      <div className="mb-4 flex gap-4">
+        <button
+          className="rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
+          onClick={() => {
+            fetch("http://localhost:3001/kanban/clc3f137b0000tk6wv3ytwdlo", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                title: textRef.current?.value,
+                tasks: [],
+              }),
+            }).then((res) => {
+              if (res.ok) {
+                window.location.reload();
+              }
+            });
+          }}
+        >
+          Create
+        </button>
+        <input type="text" ref={textRef} placeholder="Board name" />
+      </div>
       <div className="h-full rounded-lg border border-gray-200 bg-white p-6 shadow-lg">
         <h1 className="text-2xl font-semibold">Tasks</h1>
         <div className="flex max-w-[100vw-200px] overflow-x-scroll">
           {kanban.map((item) => (
-            <div className="min-w-[20vw] max-w-[30vw] p-4" key={item.id}>
+            <div className="min-w-[25vw] max-w-[30vw] p-4" key={item.id}>
               <KanbanBoard title={item.name} tasks={item.tasks} id={item.id} />
             </div>
           ))}

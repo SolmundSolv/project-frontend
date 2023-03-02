@@ -28,7 +28,7 @@ const Cart: NextPageWithLayout = () => {
                 >
                   <div className="flex items-center">
                     <Image
-                      src={"/img/" + item.img}
+                      src={"http://localhost:3001/image/" + item.img}
                       alt={item.name}
                       width={50}
                       height={50}

@@ -6,31 +6,20 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
 } from "next";
-import { ChangeEvent, ReactElement, useRef, useState } from "react";
+import type { ChangeEvent, ReactElement } from "react";
+import { useRef, useState } from "react";
 import React from "react";
 import AdminLayout from "../../../../components/Admin/AdminLayout";
 import Table from "../../../../components/Admin/Table";
 import AddAttribute from "./AddAttribute";
 import { useRouter } from "next/router";
 import withAuth from "../WithAuth";
-
-type Product = {
-  id: string;
-  name: string;
-  price: number;
-  description: string;
-  img: string;
-  category: { id: string; name: string };
-  isActivated: boolean;
-  ModelDetails: Attribute[];
-};
+import AddProduct from "./AddProduct";
 
 type SingleProduct = {
-  id: string;
   serialNumer: string;
-  boughtAt: string;
+  boughtAt: Date;
   warranty: string;
-  ProductStatus: { name: string };
 };
 
 type Attribute = {
@@ -48,12 +37,8 @@ const columns = [
     cell: (info) => <div className="text-left">{info.getValue()}</div>,
     header: () => <span>Serial Number</span>,
   }),
-  columnHelper.accessor("ProductStatus.name", {
-    cell: (info) => info.getValue(),
-    header: () => <span>Status</span>,
-  }),
   columnHelper.accessor("boughtAt", {
-    cell: (info) => info.getValue().slice(0, -14),
+    cell: (info) => info.getValue().toDateString().split("T")[0],
     header: () => <span>Bought At</span>,
   }),
   columnHelper.accessor("warranty", {
@@ -72,6 +57,7 @@ const NewProduct = ({
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [selectedFile, setSelectedFile] = useState<File>();
   const [imageSrc, setImageSrc] = useState<FileWithPreview | null>(null);
+  const [model, setModel] = useState<SingleProduct[]>([]);
   const nameRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const priceRef = useRef<HTMLInputElement>(null);
@@ -103,6 +89,7 @@ const NewProduct = ({
         price: parseInt(priceRef.current?.value ?? "0"),
         category: categoryRef.current?.value,
         attributes: attributes,
+        products: model,
         isActive: true,
       }),
       headers: {
@@ -255,7 +242,7 @@ const NewProduct = ({
                   type="text"
                   className="mt-2 w-full rounded-lg border p-2"
                   value={a.value}
-                  contentEditable={false}
+                  readOnly
                 />
               </div>
             ))
@@ -269,16 +256,23 @@ const NewProduct = ({
         </div>
         <div className="flex flex-col rounded-lg border bg-white p-6 shadow-md">
           <div className="flex justify-between">
-            <span className="text-xl font-bold">Products</span>
+            <span className="text-xl font-bold">Equipment</span>
             <button
               className="rounded-lg bg-blue-500 py-2 px-4 font-bold text-white"
               onClick={() => setOpenProduct(true)}
             >
               Add
-            </button>
+            </button>{" "}
+            <AddProduct
+              open={openProduct}
+              setOpen={setOpenProduct}
+              status={status}
+              model={model}
+              setModel={setModel}
+            />
           </div>
           <div className="mt-6">
-            <Table tableData={all} columns={columns} />
+            <Table tableData={model} columns={columns} />
           </div>
         </div>
       </div>

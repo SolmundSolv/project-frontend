@@ -2,32 +2,45 @@ import { Transition, Dialog } from "@headlessui/react";
 import type { Dispatch, FormEvent, SetStateAction } from "react";
 import React, { Fragment, useRef } from "react";
 
-const AddAttribute = ({
+const ChangeRole = ({
   open,
   setOpen,
-  attributes,
-  setAttributes,
+  id,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  attributes: { name: string; value: string }[];
-  setAttributes: Dispatch<SetStateAction<{ name: string; value: string }[]>>;
+  id: string;
 }): JSX.Element => {
-  const nameRef = useRef<HTMLInputElement>(null);
-  const valueRef = useRef<HTMLInputElement>(null);
-
-  function handleAddAttribute(e: FormEvent) {
+  const [roles, setRoles] = React.useState<{ id: string; name: string }[]>();
+  const roleRef = useRef<HTMLSelectElement>(null);
+  React.useEffect(() => {
+    fetch(`http://localhost:3001/employee/roles`)
+      .then((res) => res.json())
+      .then((data) => {
+        setRoles(data);
+      });
+  }, []);
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (nameRef.current?.value === "") return;
-    if (valueRef.current?.value === "") return;
-    setAttributes([
-      ...attributes,
-      {
-        name: nameRef.current?.value ?? "",
-        value: valueRef.current?.value ?? "",
+
+    const res = await fetch("http://localhost:3001/employee/change-role", {
+      method: "POST",
+      body: JSON.stringify({
+        id: id,
+        roleId: roleRef.current?.value,
+      }),
+      headers: {
+        "Content-Type": "application/json",
       },
-    ]);
-    setOpen(false);
+    });
+    if (res.ok) {
+      window.location.reload();
+    } else {
+      console.log("error");
+    }
+  }
+  if (!roles) {
+    return <></>;
   }
 
   return (
@@ -54,35 +67,26 @@ const AddAttribute = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Panel className="absolute top-1/2 left-1/2 flex w-full max-w-md -translate-x-1/2 -translate-y-1/2 flex-col rounded-lg bg-white shadow-xl ">
+            <Dialog.Panel className="absolute top-1/2 left-1/2 flex w-full max-w-md -translate-x-1/2 -translate-y-1/2 flex-col rounded-lg bg-white shadow-xl dark:bg-gray-800 dark:text-white">
               <div className="p-6 ">
-                <h1 className="text-2xl font-bold">Add Attribute</h1>
                 <form
                   onSubmit={(e) => {
-                    handleAddAttribute(e);
+                    onSubmit(e);
+                    setOpen(false);
                   }}
                 >
-                  <div className="mt-6 grid grid-cols-1 grid-rows-[auto]">
-                    <label htmlFor="name" className="font-bold">
-                      Name
-                    </label>
-                    <input
-                      className="rounded-lg border-gray-300"
-                      type="text"
-                      name="name"
-                      id="name"
-                      ref={nameRef}
-                    />
-                    <label className="font-bold" htmlFor="value">
-                      Value
-                    </label>
-                    <input
-                      className="rounded-lg border-gray-300"
-                      type="text"
-                      name="value"
-                      id="value"
-                      ref={valueRef}
-                    />
+                  <div className="grid grid-cols-1 grid-rows-[auto]">
+                    <label className="font-semibold">Role</label>
+                    <select
+                      className="rounded-lg bg-gray-100 px-4 py-2"
+                      ref={roleRef}
+                    >
+                      {roles.map((role) => (
+                        <option key={role.id} value={role.id}>
+                          {role.name}
+                        </option>
+                      ))}
+                    </select>
                     <button
                       type="submit"
                       className="mt-5 rounded-lg bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-600"
@@ -99,4 +103,4 @@ const AddAttribute = ({
     </Transition.Root>
   );
 };
-export default AddAttribute;
+export default ChangeRole;

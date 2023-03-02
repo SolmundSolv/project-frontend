@@ -56,13 +56,13 @@ const Comments = () => {
   return (
     <>
       <div className="mt-4 flex flex-col space-y-8">
-        <div className="flex gap-4">
+        <div className="grid gap-4">
           {comments.map((comment) => {
             return (
-              <>
+              <div className="flex" key={comment.id}>
                 <div className="h-12 w-12 rounded-full bg-gray-100">
                   <Image
-                    src={comment?.Employee.avatar}
+                    src={comment?.Employee?.avatar}
                     alt="user"
                     className="rounded-full"
                     width={32}
@@ -76,7 +76,7 @@ const Comments = () => {
                         {comment?.KanbanTaskCommentLabel[0]?.name}
                       </h2>
                       <span className="text-gray-500">
-                        {comment.Employee.name} •{" "}
+                        {comment.Employee?.name} •{" "}
                         {comment.createdAt.split("T")[0]}
                       </span>
                     </div>
@@ -85,7 +85,7 @@ const Comments = () => {
                     </p>
                   </div>
                 </div>
-              </>
+              </div>
             );
           })}
         </div>

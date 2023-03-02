@@ -15,6 +15,7 @@ const Search = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { value } = router.query;
+  if (!products) return <div>Loading...</div>;
   return (
     <div className="min-h-screen bg-white dark:bg-gray-600">
       <div className="mx-auto max-w-2xl py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:p-8">

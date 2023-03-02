@@ -14,16 +14,15 @@ const ConfirmationPage = ({
   if (!order) {
     return <div>Order not found</div>;
   }
-
   return (
-    <div className="flex min-h-screen justify-center bg-slate-500 p-6 align-middle dark:bg-gray-600 dark:text-white">
+    <div className="flex min-h-screen justify-center bg-slate-100 p-6 align-middle dark:bg-gray-600 dark:text-white">
       <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-medium">Order Confirmation</h1>
         <p className="text-gray-700 dark:text-white">
           Thank you for your order. Your order details are as follows:
         </p>
         {/* Add the confirmation details here */}
-        <div className="flex flex-col gap-2 rounded-lg bg-gray-700 p-6">
+        <div className="flex flex-col gap-2 rounded-lg bg-white p-6 dark:bg-gray-700">
           <span className="flex gap-2 text-gray-700 dark:text-white">
             <p className="font-bold">Order Number:</p> #{order.number}
           </span>
@@ -39,14 +38,14 @@ const ConfirmationPage = ({
             <p className="font-bold">Order Total:</p> $
             {order.price * order.rentDays}
           </span>
-          {order.products.map((product) => (
+          {order.products.map((product, index) => (
             <div
-              key={product.id}
-              className="rounded-lg border-b bg-white px-4 py-2 dark:border-gray-600 dark:bg-gray-600"
+              key={index}
+              className="rounded-lg border-b bg-slate-50 px-4 py-2 dark:border-gray-600 dark:bg-gray-600"
             >
               <div className="flex items-center">
                 <Image
-                  src={"/img/" + product.Model.img}
+                  src={"http://localhost:3001/image/" + product.Model.img}
                   alt={product.Model.name}
                   width={50}
                   height={50}
@@ -77,12 +76,16 @@ export default ConfirmationPage;
 export const getServerSideProps: GetServerSideProps<{
   order: Order;
 }> = async (ctx: GetServerSidePropsContext) => {
-  const { id } = ctx.query;
-  const res = await fetch(`http://localhost:3001/order/${id}`, {
-    method: "GET",
+  const { payment_intent, payment_intent_client_secret } = ctx.query;
+  const res = await fetch(`http://localhost:3001/stripe/confirm`, {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    body: JSON.stringify({
+      payment_intent,
+      payment_intent_client_secret,
+    }),
   });
   const order = await res.json();
 

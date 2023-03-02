@@ -42,6 +42,11 @@ function completeOrder(orderId: string): Promise<any> {
     method: "POST",
   }).then(() => window.location.reload());
 }
+function cancelOrder(orderId: string): Promise<any> {
+  return fetch(`http://localhost:3001/order/${orderId}/completed`, {
+    method: "POST",
+  }).then(() => window.location.reload());
+}
 
 type Products = Order["ProductHistory"] extends (infer U)[] ? U : never;
 
@@ -52,7 +57,7 @@ const columns = [
     cell: (info) => (
       <div className="flex gap-2">
         <img
-          src={`/img/${info.row.original.Product.Model.img}`}
+          src={`http://localhost:3001/image/${info.row.original.Product.Model.img}`}
           width="50"
           height="50"
           alt=""
@@ -150,7 +155,10 @@ const Order = ({
           {order.status?.name === "Ended" ? (
             <></>
           ) : (
-            <button className="rounded bg-red-600 px-4 py-2 font-bold text-white">
+            <button
+              className="rounded bg-red-600 px-4 py-2 font-bold text-white"
+              onClick={() => cancelOrder(order.id)}
+            >
               Cancel
             </button>
           )}
